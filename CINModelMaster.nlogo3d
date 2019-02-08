@@ -55,7 +55,7 @@ tumorcells-own
   MChrom20
   MChrom21
   MChrom22
-  MChromX ;----------------------------------------------------------
+  MChromX ;--------------
 
   PChrom1 ;--------------------------------- Paternal chromosome attribute
   PChrom2
@@ -79,7 +79,7 @@ tumorcells-own
   PChrom20
   PChrom21
   PChrom22
-  PChromX;----------------------------------------------------------
+  PChromX;--------------
 
   Chrom1 ;--------------------------------- Maternal + Paternal chromosome attribute
   Chrom2
@@ -103,7 +103,7 @@ tumorcells-own
   Chrom20
   Chrom21
   Chrom22
-  ChromX;----------------------------------------------------------
+  ChromX;--------------
 
   MP1 ;------------------ Probability that a maternal chromosome is missegregated
   MP2
@@ -127,7 +127,7 @@ tumorcells-own
   MP20
   MP21
   MP22
-  MPX ;---------------------------------------------------
+  MPX ;-------
 
 
   PP1 ;------------------ Probability that a paternal chromosome is missegregated
@@ -152,12 +152,9 @@ tumorcells-own
   PP20
   PP21
   PP22
-  PPX;---------------------------------------------------
+  PPX;-------
 
-
-  Double ;------------------ Probability that both copies of a chromosome pair are missegregated
-
-  MGL1 ;-------------------------------------------------- Maternal gain/loss action attribute
+  MGL1 ;------ Maternal gain/loss action attribute
   MGL2
   MGL3
   MGL4
@@ -179,9 +176,9 @@ tumorcells-own
   MGL20
   MGL21
   MGL22
-  MGLX ;---------------------------------------------------
+  MGLX ;-------
 
-  PGL1 ;-------------------------------------------------- Paternal gain/loss action attribute
+  PGL1 ;------ Paternal gain/loss action attribute
   PGL2
   PGL3
   PGL4
@@ -205,55 +202,55 @@ tumorcells-own
   PGL22
   PGLX;---------------------------------
 
-  Mdiv1
-  Mdiv2
-  Mdiv3
-  Mdiv4
-  Mdiv5
-  Mdiv6
-  Mdiv7
-  Mdiv8
-  Mdiv9
-  Mdiv10
-  Mdiv11
-  Mdiv12
-  Mdiv13
-  Mdiv14
-  Mdiv15
-  Mdiv16
-  Mdiv17
-  Mdiv18
-  Mdiv19
-  Mdiv20
-  Mdiv21
-  Mdiv22
-  MdivX
+  mmiseg1
+  mmiseg2
+  mmiseg3
+  mmiseg4
+  mmiseg5
+  mmiseg6
+  mmiseg7
+  mmiseg8
+  mmiseg9
+  mmiseg10
+  mmiseg11
+  mmiseg12
+  mmiseg13
+  mmiseg14
+  mmiseg15
+  mmiseg16
+  mmiseg17
+  mmiseg18
+  mmiseg19
+  mmiseg20
+  mmiseg21
+  mmiseg22
+  mmisegX
 
-  Pdiv1
-  Pdiv2
-  Pdiv3
-  Pdiv4
-  Pdiv5
-  Pdiv6
-  Pdiv7
-  Pdiv8
-  Pdiv9
-  Pdiv10
-  Pdiv11
-  Pdiv12
-  Pdiv13
-  Pdiv14
-  Pdiv15
-  Pdiv16
-  Pdiv17
-  Pdiv18
-  Pdiv19
-  Pdiv20
-  Pdiv21
-  Pdiv22
-  PdivX
+  pmiseg1
+  pmiseg2
+  pmiseg3
+  pmiseg4
+  pmiseg5
+  pmiseg6
+  pmiseg7
+  pmiseg8
+  pmiseg9
+  pmiseg10
+  pmiseg11
+  pmiseg12
+  pmiseg13
+  pmiseg14
+  pmiseg15
+  pmiseg16
+  pmiseg17
+  pmiseg18
+  pmiseg19
+  pmiseg20
+  pmiseg21
+  pmiseg22
+  pmisegX
 
-  Fc1 ;--------------------------------------------------- normalized gene values for each chromosome
+  Fc1 ;------- normalized gene values for each chromosome
   Fc2
   Fc3
   Fc4
@@ -310,14 +307,7 @@ to setup
   clear-all
   set-default-shape tumorcells "circle"
   setup-progenitor
-  setup-patches
   reset-ticks
-end
-
-to setup-patches
-  ask patches [
-    set pcolor [ 0 0 0 0]
-  ]
 end
 
 to setup-progenitor
@@ -444,26 +434,87 @@ end
 
 to go
 if (ticks < 1) [ reset-timer ]
-
-;if count tumorcells >= end-population
-  if (ticks >= start-cin) [ask tumorcells [set CIN-level initial-CIN]]
-if ticks = end-ticks or count tumorcells >= end-population
+tick
+if (ticks >= start-cin)
   [
-show (word "Execution  finished  in " timer " seconds ")
-    ;ask n-of 10 tumorcells
     ask tumorcells
     [
-      ;output-show chromavg
-      ;output-show fitness
-    ]
-output-chromosome-state
-reset-division-state
-stop
-]
+      set CIN-level initial-CIN
+  ]]
+if ticks = end-ticks or count tumorcells >= end-population
+  [
+    show (word "Execution  finished  in " timer " seconds ")
+    output-chromosome-state
+    stop
+  ]
   check-death
   calculate-chromosome-scores
   calculate-fitness
+  assign-resources
+  assign-cin
+  reset-division-state
+  ask tumorcells[
+    if resources >= 100
+    [
+      mitosis1
+      mitosis2
+    ]]
 
+end
+
+to reset-division-state
+  ask tumorcells [
+  set mmiseg1 0
+  set mmiseg2 0
+  set mmiseg3 0
+  set mmiseg4 0
+  set mmiseg5 0
+  set mmiseg6 0
+  set mmiseg7 0
+  set mmiseg8 0
+  set mmiseg9 0
+  set mmiseg10 0
+  set mmiseg11 0
+  set mmiseg12 0
+  set mmiseg13 0
+  set mmiseg14 0
+  set mmiseg15 0
+  set mmiseg16 0
+  set mmiseg17 0
+  set mmiseg18 0
+  set mmiseg19 0
+  set mmiseg20 0
+  set mmiseg21 0
+  set mmiseg22 0
+  set mmisegX 0
+
+  set pmiseg1 0
+  set pmiseg2 0
+  set pmiseg3 0
+  set pmiseg4 0
+  set pmiseg5 0
+  set pmiseg6 0
+  set pmiseg7 0
+  set pmiseg8 0
+  set pmiseg9 0
+  set pmiseg10 0
+  set pmiseg11 0
+  set pmiseg12 0
+  set pmiseg13 0
+  set pmiseg14 0
+  set pmiseg15 0
+  set pmiseg16 0
+  set pmiseg17 0
+  set pmiseg18 0
+  set pmiseg19 0
+  set pmiseg20 0
+  set pmiseg21 0
+  set pmiseg22 0
+  set pmisegX 0
+  ]
+end
+
+to assign-resources
   ask tumorcells
   [ifelse fitness >= 1.0
     [set resources resources + 50]
@@ -486,9 +537,12 @@ stop
                     [ifelse fitness >= 0.1
                       [set resources resources + 5]
                       [if fitness < 0 [die]
-  ]]]]]]]]]]
+  ]]]]]]]]]]]
+end
 
-    ;-------------------------------------- Set paternal gain/loss probabilities
+to assign-cin
+      ;-------------------------------------- Set paternal gain/loss probabilities
+  ask tumorcells[
     if CIN-level = 0 [
     set PP1 999
     set PP2 999
@@ -1105,72 +1159,6 @@ stop
     set MGL21 random 2
     set MGL22 random 2
     set MGLX random 2
-
-
-
-    if resources >= 100
-    [
-    mitosis1
-    mitosis2
-    ]
-]
-  tick
-
-  ask tumorcells [
-  ifelse show-resources?
-  [ set label fitness ]
-    [ set label "" ]]
-end
-
-to reset-division-state
-  ask tumorcells [
-  set Mdiv1 FALSE
-  set Mdiv2 FALSE
-  set Mdiv3 FALSE
-  set Mdiv4 FALSE
-  set Mdiv5 FALSE
-  set Mdiv6 FALSE
-  set Mdiv7 FALSE
-  set Mdiv8 FALSE
-  set Mdiv9 FALSE
-  set Mdiv10 FALSE
-  set Mdiv11 FALSE
-  set Mdiv12 FALSE
-  set Mdiv13 FALSE
-  set Mdiv14 FALSE
-  set Mdiv15 FALSE
-  set Mdiv16 FALSE
-  set Mdiv17 FALSE
-  set Mdiv18 FALSE
-  set Mdiv19 FALSE
-  set Mdiv20 FALSE
-  set Mdiv21 FALSE
-  set Mdiv22 FALSE
-  set MdivX FALSE
-
-  set Pdiv1 FALSE
-  set Pdiv2 FALSE
-  set Pdiv3 FALSE
-  set Pdiv4 FALSE
-  set Pdiv5 FALSE
-  set Pdiv6 FALSE
-  set Pdiv7 FALSE
-  set Pdiv8 FALSE
-  set Pdiv9 FALSE
-  set Pdiv10 FALSE
-  set Pdiv11 FALSE
-  set Pdiv12 FALSE
-  set Pdiv13 FALSE
-  set Pdiv14 FALSE
-  set Pdiv15 FALSE
-  set Pdiv16 FALSE
-  set Pdiv17 FALSE
-  set Pdiv18 FALSE
-  set Pdiv19 FALSE
-  set Pdiv20 FALSE
-  set Pdiv21 FALSE
-  set Pdiv22 FALSE
-  set PdivX FALSE
   ]
 end
 
@@ -1179,466 +1167,421 @@ to mitosis1
 
    if MP1 < 10 and MChrom1 > 0
    [
-    set Mdiv1 TRUE
     ifelse MGL1 = 0
     [set MChrom1 Mchrom1 - 1
      set karyotype karyotype - 1]
     [set MChrom1 MChrom1 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg1 1 ]
 
    if MP2 < 10 and MChrom2 > 0
    [
-    set Mdiv2 TRUE
     ifelse MGL2 = 0
     [set MChrom2 MChrom2 - 1
      set karyotype karyotype - 1]
     [set MChrom2 MChrom2 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg2 1 ]
 
    if MP3 < 10 and MChrom3 > 0
    [
-    set Mdiv3 TRUE
     ifelse MGL3 = 0
     [set MChrom3 MChrom3 - 1
      set karyotype karyotype - 1]
     [set MChrom3 MChrom3 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg3 1 ]
 
    if MP4 < 10 and MChrom4 > 0
    [
-    set Mdiv4 TRUE
     ifelse MGL4 = 0
     [set MChrom4 MChrom4 - 1
      set karyotype karyotype - 1]
     [set MChrom4 MChrom4 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg4 1 ]
 
    if MP5 < 10 and MChrom5 > 0
    [
-    set Mdiv5 TRUE
     ifelse MGL5 = 0
     [set MChrom5 MChrom5 - 1
      set karyotype karyotype - 1]
     [set MChrom5 MChrom5 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg5 1 ]
 
    if MP6 < 10 and MChrom6 > 0
    [
-    set Mdiv6 TRUE
     ifelse MGL6 = 0
     [set MChrom6 MChrom6 - 1
      set karyotype karyotype - 1]
     [set MChrom6 MChrom6 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg6 1 ]
 
    if MP7 < 10 and MChrom7 > 0
    [
-    set Mdiv7 TRUE
     ifelse MGL7 = 0
     [set MChrom7 MChrom7 - 1
      set karyotype karyotype - 1]
     [set MChrom7 MChrom7 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg7 1 ]
 
    if MP8 < 10 and MChrom8 > 0
    [
-    set Mdiv8 TRUE
     ifelse MGL8 = 0
     [set MChrom8 MChrom8 - 1
      set karyotype karyotype - 1]
     [set MChrom8 MChrom8 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg8 1 ]
 
    if MP9 < 10 and MChrom9 > 0
    [
-    set Mdiv9 TRUE
     ifelse MGL9 = 0
     [set MChrom9 MChrom9 - 1
      set karyotype karyotype - 1]
     [set MChrom9 MChrom9 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg9 1 ]
 
    if MP10 < 10 and MChrom10 > 0
    [
-    set Mdiv10 TRUE
     ifelse MGL10 = 0
     [set MChrom10 MChrom10 - 1
      set karyotype karyotype - 1]
     [set MChrom10 MChrom10 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg10 1 ]
 
    if MP11 < 10 and MChrom11 > 0
    [
-    set Mdiv11 TRUE
     ifelse MGL11 = 0
     [set MChrom11 MChrom11 - 1
      set karyotype karyotype - 1]
     [set MChrom11 MChrom11 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg11 1 ]
 
    if MP12 < 10 and MChrom12 > 0
    [
-    set Mdiv12 TRUE
     ifelse MGL12 = 0
     [set MChrom12 MChrom12 - 1
      set karyotype karyotype - 1]
     [set MChrom12 MChrom12 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg12 1 ]
 
    if MP13 < 10 and MChrom13 > 0
    [
-    set Mdiv13 TRUE
     ifelse MGL13 = 0
     [set MChrom13 MChrom13 - 1
      set karyotype karyotype - 1]
     [set MChrom13 MChrom13 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg13 1 ]
 
    if MP14 < 10 and MChrom14 > 0
    [
-    set Mdiv14 TRUE
     ifelse MGL14 = 0
     [set MChrom14 MChrom14 - 1
      set karyotype karyotype - 1]
     [set MChrom14 MChrom14 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg14 1 ]
 
    if MP15 < 10 and MChrom15 > 0
    [
-    set Mdiv15 TRUE
     ifelse MGL15 = 0
     [set MChrom15 MChrom15 - 1
      set karyotype karyotype - 1]
     [set MChrom15 MChrom15 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg15 1 ]
 
    if MP16 < 10 and MChrom16 > 0
    [
-    set Mdiv16 TRUE
     ifelse MGL16 = 0
     [set MChrom16 MChrom16 - 1
      set karyotype karyotype - 1]
     [set MChrom16 MChrom16 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg16 1 ]
 
    if MP17 < 10 and MChrom17 > 0
    [
-    set Mdiv17 TRUE
     ifelse MGL17 = 0
     [set MChrom17 MChrom17 - 1
      set karyotype karyotype - 1]
     [set MChrom17 MChrom17 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg17 1 ]
 
    if MP18 < 10 and MChrom18 > 0
    [
-    set Mdiv18 TRUE
     ifelse MGL18 = 0
     [set MChrom18 MChrom18 - 1
      set karyotype karyotype - 1]
     [set MChrom18 MChrom18 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg18 1 ]
 
    if MP19 < 10 and MChrom19 > 0
    [
-    set Mdiv19 TRUE
     ifelse MGL19 = 0
     [set MChrom19 MChrom19 - 1
      set karyotype karyotype - 1]
     [set MChrom19 MChrom19 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg19 1 ]
 
    if MP20 < 10 and MChrom20 > 0
    [
-    set Mdiv20 TRUE
     ifelse MGL20 = 0
     [set MChrom20 MChrom20 - 1
      set karyotype karyotype - 1]
     [set MChrom20 MChrom20 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg20 1 ]
 
    if MP21 < 10 and MChrom21 > 0
    [
-    set Mdiv21 TRUE
     ifelse MGL21 = 0
     [set MChrom21 MChrom21 - 1
      set karyotype karyotype - 1]
     [set MChrom21 MChrom21 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg21 1 ]
 
    if MP22 < 10 and MChrom22 > 0
    [
-    set Mdiv22 TRUE
     ifelse MGL22 = 0
     [set MChrom22 MChrom22 - 1
      set karyotype karyotype - 1]
     [set MChrom22 MChrom22 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmiseg22 1 ]
 
    if MPX < 10 and MChromX > 0
    [
-    set MdivX TRUE
     ifelse MGLX = 0
     [set MChromX MChromX - 1
      set karyotype karyotype - 1]
     [set MChromX MChromX + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set mmisegX 1 ]
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   if PP1 < 10 and PChrom1 > 0
    [
-    set Pdiv1 TRUE
     ifelse PGL1 = 0
     [set PChrom1 PChrom1 - 1
      set karyotype karyotype - 1]
     [set PChrom1 PChrom1 + 1
-     set karyotype karyotype + 1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg1 1 ]
 
   if PP2 < 10 and PChrom2 > 0
    [
-    set Pdiv2 TRUE
-    ifelse PGL2 = 1
+    ifelse PGL2 = 0
     [set PChrom2 PChrom2 -  1
      set karyotype karyotype -  1]
     [set PChrom2 PChrom2 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg2 1 ]
 
   if PP3 < 10 and PChrom3 > 0
    [
-    set Pdiv3 TRUE
     ifelse PGL3 = 0
     [set PChrom3 PChrom3 -  1
      set karyotype karyotype -  1]
     [set PChrom3 PChrom3 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg3 1 ]
 
   if PP4 < 10 and PChrom4 > 0
    [
-    set Pdiv4 TRUE
     ifelse PGL4 = 0
     [set PChrom4 PChrom4 -  1
      set karyotype karyotype -  1]
     [set PChrom4 PChrom4 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg4 1 ]
 
   if PP5 < 10 and PChrom5 > 0
    [
-     set Pdiv5 TRUE
     ifelse PGL5 = 0
     [set PChrom5 PChrom5 -  1
      set karyotype karyotype -  1]
     [set PChrom5 PChrom5 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg5 1 ]
 
   if PP6 < 10 and PChrom6 > 0
    [
-    set Pdiv6 TRUE
     ifelse PGL6 = 0
     [set PChrom6 PChrom6 -  1
      set karyotype karyotype -  1]
     [set PChrom6 PChrom6 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg6 1 ]
 
   if PP7 < 10 and PChrom7 > 0
    [
-    set Pdiv7 TRUE
     ifelse PGL7 = 0
     [set PChrom7 PChrom7 -  1
      set karyotype karyotype -  1]
     [set PChrom7 PChrom7 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg7 1 ]
 
   if PP8 < 10 and PChrom8 > 0
    [
-      set Pdiv8 TRUE
     ifelse PGL8 = 0
     [set PChrom8 PChrom8 -  1
      set karyotype karyotype -  1]
     [set PChrom8 PChrom8 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg8 1 ]
 
   if PP9 < 10 and PChrom9 > 0
    [
-      set Pdiv9 TRUE
     ifelse PGL9 = 0
     [set PChrom9 PChrom9 -  1
      set karyotype karyotype -  1]
     [set PChrom9 PChrom9 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg9 1 ]
 
   if PP10 < 10 and PChrom10 > 0
    [
-      set Pdiv10 TRUE
     ifelse PGL10 = 0
     [set PChrom10 PChrom10 -  1
      set karyotype karyotype -  1]
     [set PChrom10 PChrom10 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg10 1 ]
 
   if PP11 < 10 and PChrom11 > 0
    [
-      set Pdiv11 TRUE
     ifelse PGL11 = 0
     [set PChrom11 PChrom11 -  1
      set karyotype karyotype -  1]
     [set PChrom11 PChrom11 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg11 1 ]
 
   if PP12 < 10 and PChrom12 > 0
    [
-      set Pdiv12 TRUE
     ifelse PGL12 = 0
     [set PChrom12 PChrom12 -  1
      set karyotype karyotype -  1]
     [set PChrom12 PChrom12 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg12 1 ]
 
   if PP13 < 10 and PChrom13 > 0
    [
-      set Pdiv13 TRUE
     ifelse PGL13 = 0
     [set PChrom13 PChrom13 -  1
      set karyotype karyotype -  1]
     [set PChrom13 PChrom13 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg13 1 ]
 
   if PP14 < 10 and PChrom14 > 0
    [
-      set Pdiv14 TRUE
     ifelse PGL14 = 0
     [set PChrom14 PChrom14 -  1
      set karyotype karyotype -  1]
     [set PChrom14 PChrom14 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg14 1 ]
 
   if PP15 < 10 and PChrom15 > 0
    [
-      set Pdiv15 TRUE
     ifelse PGL15 = 0
     [set PChrom15 PChrom15 -  1
      set karyotype karyotype -  1]
     [set PChrom15 PChrom15 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg15 1 ]
 
   if PP16 < 10 and PChrom16 > 0
    [
-      set Pdiv16 TRUE
     ifelse PGL16 = 0
     [set PChrom16 PChrom16 -  1
      set karyotype karyotype -  1]
     [set PChrom16 PChrom16 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg16 1 ]
 
   if PP17 < 10 and PChrom17 > 0
    [
-      set Pdiv17 TRUE
     ifelse PGL17 = 0
     [set PChrom17 PChrom17 -  1
      set karyotype karyotype -  1]
     [set PChrom17 PChrom17 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg17 1 ]
 
 
   if PP18 < 10 and PChrom18 > 0
    [
-      set Pdiv18 TRUE
     ifelse PGL18 = 0
     [set PChrom18 PChrom18 -  1
      set karyotype karyotype -  1]
     [set PChrom18 PChrom18 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg18 1 ]
 
   if PP19 < 10 and PChrom19 > 0
    [
-      set Pdiv19 TRUE
     ifelse PGL19 = 0
     [set PChrom19 PChrom19 -  1
      set karyotype karyotype -  1]
     [set PChrom19 PChrom19 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg19 1 ]
 
   if PP20 < 10 and PChrom20 > 0
    [
-      set Pdiv20 TRUE
     ifelse PGL20 = 0
     [set PChrom20 PChrom20 -  1
      set karyotype karyotype -  1]
     [set PChrom20 PChrom20 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg20 1 ]
 
   if PP21 < 10 and PChrom21 > 0
    [
-      set Pdiv21 TRUE
     ifelse PGL21 = 0
     [set PChrom21 PChrom21 -  1
      set karyotype karyotype -  1]
     [set PChrom21 PChrom21 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg21 1 ]
 
   if PP22 < 10 and PChrom22 > 0
    [
-      set Pdiv22 TRUE
     ifelse PGL22 = 0
     [set PChrom22 PChrom22 -  1
      set karyotype karyotype -  1]
     [set PChrom22 PChrom22 +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmiseg22 1 ]
 
   if PPX < 10 and PChromX > 0
    [
-      set PdivX TRUE
     ifelse PGLX = 0
     [set PChromX PChromX -  1
      set karyotype karyotype -  1]
     [set PChromX PChromX +  1
-     set karyotype karyotype +  1
-  ]]
+     set karyotype karyotype + 1]
+  set pmisegX 1 ]
+
 
     set Chrom1 (MChrom1 + PChrom1)
     set Chrom2 (MChrom2 + PChrom2)
@@ -1670,7 +1613,7 @@ to mitosis2
     [
       set resources 50
 
-    if MP1 < 10 and Mdiv1 = TRUE
+    if MP1 < 10 and mmiseg1 = 1
    [
     ifelse MGL1 = 0
     [set MChrom1 Mchrom1 + 2
@@ -1679,7 +1622,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP2 < 10 and Mdiv2 = TRUE
+   if MP2 < 10 and mmiseg2 = 1
    [
     ifelse MGL2 = 0
     [set MChrom2 MChrom2 + 2
@@ -1688,7 +1631,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP3 < 10 and Mdiv3 = TRUE
+   if MP3 < 10 and mmiseg3 = 1
    [
     ifelse MGL3 = 0
     [set MChrom3 MChrom3 + 2
@@ -1697,7 +1640,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP4 < 10 and Mdiv4 = TRUE
+   if MP4 < 10 and mmiseg4 = 1
    [
     ifelse MGL4 = 0
     [set MChrom4 MChrom4 + 2
@@ -1706,7 +1649,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP5 < 10 and Mdiv5 = TRUE
+   if MP5 < 10 and mmiseg5 = 1
    [
     ifelse MGL5 = 0
     [set MChrom5 MChrom5 + 2
@@ -1715,7 +1658,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP6 < 10 and Mdiv6 = TRUE
+   if MP6 < 10 and mmiseg6 = 1
    [
     ifelse MGL6 = 0
     [set MChrom6 MChrom6 + 2
@@ -1724,7 +1667,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP7 < 10 and Mdiv7 = TRUE
+   if MP7 < 10 and mmiseg7 = 1
    [
     ifelse MGL7 = 0
     [set MChrom7 MChrom7 + 2
@@ -1733,7 +1676,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP8 < 10 and Mdiv8 = TRUE
+   if MP8 < 10 and mmiseg8 = 1
    [
     ifelse MGL8 = 0
     [set MChrom8 MChrom8 + 2
@@ -1742,7 +1685,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP9 < 10 and Mdiv9 = TRUE
+   if MP9 < 10 and mmiseg9 = 1
    [
     ifelse MGL9 = 0
     [set MChrom9 MChrom9 + 2
@@ -1751,7 +1694,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP10 < 10 and Mdiv10 = TRUE
+   if MP10 < 10 and mmiseg10 = 1
    [
     ifelse MGL10 = 0
     [set MChrom10 MChrom10 + 2
@@ -1760,7 +1703,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP11 < 10 and Mdiv11 = TRUE
+   if MP11 < 10 and mmiseg11 = 1
    [
     ifelse MGL11 = 0
     [set MChrom11 MChrom11 + 2
@@ -1769,7 +1712,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP12 < 10 and Mdiv12 = TRUE
+   if MP12 < 10 and mmiseg12 = 1
    [
     ifelse MGL12 = 0
     [set MChrom12 MChrom12 + 2
@@ -1778,7 +1721,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP13 < 10 and Mdiv13 = TRUE
+   if MP13 < 10 and mmiseg13 = 1
    [
     ifelse MGL13 = 0
     [set MChrom13 MChrom13 + 2
@@ -1787,7 +1730,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP14 < 10 and Mdiv14 = TRUE
+   if MP14 < 10 and mmiseg14 = 1
    [
     ifelse MGL14 = 0
     [set MChrom14 MChrom14 + 2
@@ -1796,7 +1739,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP15 < 10 and Mdiv15 = TRUE
+   if MP15 < 10 and mmiseg15 = 1
    [
     ifelse MGL15 = 0
     [set MChrom15 MChrom15 + 2
@@ -1805,7 +1748,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP16 < 10 and Mdiv16 = TRUE
+   if MP16 < 10 and mmiseg16 = 1
    [
     ifelse MGL16 = 0
     [set MChrom16 MChrom16 + 2
@@ -1814,7 +1757,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP17 < 10 and Mdiv17 = TRUE
+   if MP17 < 10 and mmiseg17 = 1
    [
     ifelse MGL17 = 0
     [set MChrom17 MChrom17 + 2
@@ -1823,7 +1766,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP18 < 10 and Mdiv18 = TRUE
+   if MP18 < 10 and mmiseg18 = 1
    [
     ifelse MGL18 = 0
     [set MChrom18 MChrom18 + 2
@@ -1832,7 +1775,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP19 < 10 and Mdiv19 = TRUE
+   if MP19 < 10 and mmiseg19 = 1
    [
     ifelse MGL19 = 0
     [set MChrom19 MChrom19 + 2
@@ -1841,7 +1784,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP20 < 10 and Mdiv20 = TRUE
+   if MP20 < 10 and mmiseg20 = 1
    [
     ifelse MGL20 = 0
     [set MChrom20 MChrom20 + 2
@@ -1850,7 +1793,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP21 < 10 and Mdiv21 = TRUE
+   if MP21 < 10 and mmiseg21 = 1
    [
     ifelse MGL21 = 0
     [set MChrom21 MChrom21 + 2
@@ -1859,7 +1802,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MP22 < 10 and Mdiv22 = TRUE
+   if MP22 < 10 and mmiseg22 = 1
    [
     ifelse MGL22 = 0
     [set MChrom22 MChrom22 + 2
@@ -1868,7 +1811,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-   if MPX < 10 and MdivX = TRUE
+   if MPX < 10 and mmisegX = 1
    [
     ifelse MGLX = 0
     [set MChromX MChromX + 2
@@ -1879,7 +1822,7 @@ to mitosis2
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  if PP1 < 10 and Pdiv1 = TRUE
+  if PP1 < 10 and pmiseg1 = 1
    [
     ifelse PGL1 = 0
     [set PChrom1 PChrom1 + 2
@@ -1888,7 +1831,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP2 < 10 and Pdiv2 = TRUE
+  if PP2 < 10 and pmiseg2 = 1
    [
     ifelse PGL2 = 0
     [set PChrom2 PChrom2 + 2
@@ -1897,7 +1840,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP3 < 10 and Pdiv3 = TRUE
+  if PP3 < 10 and pmiseg3 = 1
    [
     ifelse PGL3 = 0
     [set PChrom3 PChrom3 + 2
@@ -1906,7 +1849,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP4 < 10 and Pdiv4 = TRUE
+  if PP4 < 10 and pmiseg4 = 1
    [
     ifelse PGL4 = 0
     [set PChrom4 PChrom4 + 2
@@ -1915,7 +1858,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP5 < 10 and Pdiv5 = TRUE
+  if PP5 < 10 and pmiseg5 = 1
    [
     ifelse PGL5 = 0
     [set PChrom5 PChrom5 + 2
@@ -1924,7 +1867,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP6 < 10 and Pdiv6 = TRUE
+  if PP6 < 10 and pmiseg6 = 1
    [
     ifelse PGL6 = 0
     [set PChrom6 PChrom6 + 2
@@ -1933,7 +1876,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP7 < 10 and Pdiv7 = TRUE
+  if PP7 < 10 and pmiseg7 = 1
    [
     ifelse PGL7 = 0
     [set PChrom7 PChrom7 + 2
@@ -1942,7 +1885,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP8 < 10 and Pdiv8 = TRUE
+  if PP8 < 10 and pmiseg8 = 1
    [
     ifelse PGL8 = 0
     [set PChrom8 PChrom8 + 2
@@ -1951,7 +1894,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP9 < 10 and Pdiv9 = TRUE
+  if PP9 < 10 and pmiseg9 = 1
    [
     ifelse PGL9 = 0
     [set PChrom9 PChrom9 + 2
@@ -1960,7 +1903,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP10 < 10 and Pdiv10 = TRUE
+  if PP10 < 10 and pmiseg10 = 1
    [
     ifelse PGL10 = 0
     [set PChrom10 PChrom10 + 2
@@ -1969,7 +1912,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP11 < 10 and Pdiv11 = TRUE
+  if PP11 < 10 and pmiseg11 = 1
    [
     ifelse PGL11 = 0
     [set PChrom11 PChrom11 + 2
@@ -1978,7 +1921,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP12 < 10 and Pdiv12 = TRUE
+  if PP12 < 10 and pmiseg12 = 1
    [
     ifelse PGL12 = 0
     [set PChrom12 PChrom12 + 2
@@ -1987,7 +1930,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP13 < 10 and Pdiv13 = TRUE
+  if PP13 < 10 and pmiseg13 = 1
    [
     ifelse PGL13 = 0
     [set PChrom13 PChrom13 + 2
@@ -1996,7 +1939,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP14 < 10 and Pdiv14 = TRUE
+  if PP14 < 10 and pmiseg14 = 1
    [
     ifelse PGL14 = 0
     [set PChrom14 PChrom14 + 2
@@ -2005,7 +1948,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP15 < 10 and Pdiv15 = TRUE
+  if PP15 < 10 and pmiseg15 = 1
    [
     ifelse PGL15 = 0
     [set PChrom15 PChrom15 + 2
@@ -2014,7 +1957,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP16 < 10 and Pdiv16 = TRUE
+  if PP16 < 10 and pmiseg16 = 1
    [
     ifelse PGL16 = 0
     [set PChrom16 PChrom16 + 2
@@ -2023,7 +1966,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP17 < 10 and Pdiv17 = TRUE
+  if PP17 < 10 and pmiseg17 = 1
    [
     ifelse PGL17 = 0
     [set PChrom17 PChrom17 + 2
@@ -2033,7 +1976,7 @@ to mitosis2
   ]]
 
 
-  if PP18 < 10 and Pdiv18 = TRUE
+  if PP18 < 10 and pmiseg18 = 1
    [
     ifelse PGL18 = 0
     [set PChrom18 PChrom18 + 2
@@ -2042,7 +1985,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP19 < 10 and Pdiv19 = TRUE
+  if PP19 < 10 and pmiseg19 = 1
    [
     ifelse PGL19 = 0
     [set PChrom19 PChrom19 + 2
@@ -2051,7 +1994,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP20 < 10 and Pdiv20 = TRUE
+  if PP20 < 10 and pmiseg20 = 1
    [
     ifelse PGL20 = 0
     [set PChrom20 PChrom20 + 2
@@ -2060,7 +2003,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP21 < 10 and Pdiv21 = TRUE
+  if PP21 < 10 and pmiseg21 = 1
    [
     ifelse PGL21 = 0
     [set PChrom21 PChrom21 + 2
@@ -2069,7 +2012,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PP22 < 10 and Pdiv22 = TRUE
+  if PP22 < 10 and pmiseg22 = 1
    [
     ifelse PGL22 = 0
     [set PChrom22 PChrom22 + 2
@@ -2078,7 +2021,7 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-  if PPX < 10 and PdivX = TRUE
+  if PPX < 10 and pmisegX = 1
    [
     ifelse PGLX = 0
     [set PChromX PChromX + 2
@@ -2351,7 +2294,7 @@ initial-CIN
 initial-CIN
 0
 10
-5.0
+7.0
 1
 1
 NIL
@@ -2365,7 +2308,7 @@ SLIDER
 initial-number
 initial-number
 1
-1
+10
 1.0
 1
 1
@@ -2502,7 +2445,7 @@ end-population
 end-population
 1000
 200000
-140000.0
+200000.0
 1000
 1
 NIL
@@ -2536,7 +2479,7 @@ selective-pressure
 selective-pressure
 0
 100
-0.0
+10.0
 1
 1
 NIL
@@ -2585,7 +2528,7 @@ start-cin
 start-cin
 0
 20
-0.0
+12.0
 1
 1
 NIL
@@ -2597,7 +2540,7 @@ INPUTBOX
 684
 135
 end-ticks
-15.0
+22.0
 1
 0
 Number
@@ -2753,6 +2696,29 @@ initial-ploidy
 1
 NIL
 HORIZONTAL
+
+PLOT
+0
+465
+230
+620
+plot 1
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count turtles with [chrom1 < 0]"
+"pen-1" 1.0 0 -12087248 true "" "plot count turtles with [chrom2 < 0]"
+"pen-2" 1.0 0 -7500403 true "" "plot count turtles with [chrom3 < 0]"
+"pen-3" 1.0 0 -2674135 true "" "plot count turtles with [chrom4 < 0]"
+"pen-4" 1.0 0 -955883 true "" "plot count turtles with [chrom5 < 0]"
+"pen-5" 1.0 0 -6459832 true "" "plot count turtles with [chrom6 < 0]"
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -3365,7 +3331,7 @@ need-to-manually-make-preview-for-this-model
       <value value="14"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="FitnessPloidyModel" repetitions="40" runMetricsEveryStep="false">
+  <experiment name="FitnessPloidyModel" repetitions="5" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
     <metric>count tumorcells</metric>
@@ -3403,29 +3369,26 @@ need-to-manually-make-preview-for-this-model
       <value value="false"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="initial-CIN">
-      <value value="1"/>
-      <value value="4"/>
-      <value value="5"/>
+      <value value="2"/>
       <value value="6"/>
-      <value value="7"/>
       <value value="8"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="initial-ploidy">
       <value value="2"/>
+      <value value="3"/>
       <value value="4"/>
-      <value value="6"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="selective-pressure">
       <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="end-ticks">
-      <value value="7"/>
+      <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="end-population">
       <value value="140000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="start-cin">
-      <value value="6"/>
+      <value value="8"/>
     </enumeratedValueSet>
   </experiment>
   <experiment name="CINModelV6" repetitions="10" runMetricsEveryStep="false">
@@ -3488,16 +3451,16 @@ need-to-manually-make-preview-for-this-model
       <value value="100"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="end-ticks">
-      <value value="11"/>
-      <value value="12"/>
+      <value value="14"/>
       <value value="15"/>
-      <value value="20"/>
+      <value value="18"/>
+      <value value="23"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="end-population">
-      <value value="140000"/>
+      <value value="200000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="start-cin">
-      <value value="10"/>
+      <value value="13"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
