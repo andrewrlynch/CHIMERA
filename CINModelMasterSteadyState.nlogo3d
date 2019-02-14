@@ -1163,10 +1163,50 @@ to assign-cin
     set MGL22 random 2
     set MGLX random 2
 
-    ifelse CIN-level = 0
-    [set CIN-rate 0]
-    [set CIN-rate 10 / MP1]
-  ]
+if CIN-level = 0
+    [
+      set CIN-rate 0
+    ]
+if CIN-level = 1
+    [
+      set CIN-rate (10 / 3680)
+    ]
+if CIN-level = 2
+    [
+      set CIN-rate (10 / 1840)
+if CIN-level = 3
+    [
+      set CIN-rate (10 / 920)
+    ]
+if CIN-level = 4
+    [
+      set CIN-rate (10 / 460)
+    ]
+if CIN-level = 5
+    [
+      set CIN-rate (10 / 230)
+    ]
+if CIN-level = 6
+    [
+      set CIN-rate (10 / 120)
+    ]
+if CIN-level = 7
+    [
+      set CIN-rate (10 / 60)
+    ]
+if CIN-level = 8
+    [
+      set CIN-rate (10 / 30)
+    ]
+if CIN-level = 9
+    [
+      set CIN-rate (10 / 20)
+    ]
+if CIN-level = 10
+    [
+      set CIN-rate (10 / 15)
+    ]      
+  ]]
 end
 
 to mitosis1
