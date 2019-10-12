@@ -3463,6 +3463,67 @@ need-to-manually-make-preview-for-this-model
       <value value="13"/>
     </enumeratedValueSet>
   </experiment>
+  <experiment name="MissegBias" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>count tumorcells</metric>
+    <metric>count turtles with [karyotype / 23 != initial-ploidy]</metric>
+    <metric>Chrom1-final</metric>
+    <metric>Chrom2-final</metric>
+    <metric>Chrom3-final</metric>
+    <metric>Chrom4-final</metric>
+    <metric>Chrom5-final</metric>
+    <metric>Chrom6-final</metric>
+    <metric>Chrom7-final</metric>
+    <metric>Chrom8-final</metric>
+    <metric>Chrom9-final</metric>
+    <metric>Chrom10-final</metric>
+    <metric>Chrom11-final</metric>
+    <metric>Chrom12-final</metric>
+    <metric>Chrom13-final</metric>
+    <metric>Chrom14-final</metric>
+    <metric>Chrom15-final</metric>
+    <metric>Chrom16-final</metric>
+    <metric>Chrom17-final</metric>
+    <metric>Chrom18-final</metric>
+    <metric>Chrom19-final</metric>
+    <metric>Chrom20-final</metric>
+    <metric>Chrom21-final</metric>
+    <metric>Chrom22-final</metric>
+    <metric>ChromX-final</metric>
+    <enumeratedValueSet variable="initial-number">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="SAC">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="show-resources?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-CIN">
+      <value value="0"/>
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-ploidy">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="selective-pressure">
+      <value value="0"/>
+      <value value="1"/>
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="end-ticks">
+      <value value="515"/>
+      <value value="1015"/>
+      <value value="5015"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="end-population">
+      <value value="400000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="start-cin">
+      <value value="15"/>
+    </enumeratedValueSet>
+  </experiment>
 </experiments>
 @#$#@#$#@
 @#$#@#$#@

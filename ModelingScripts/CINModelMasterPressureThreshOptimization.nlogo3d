@@ -1,10 +1,8 @@
-;Changes to v10 from v9: Add more CIN levels and probability for same chromosome missegregating twice.
-
 breed [tumorcells tumorcell]
 
-globals
-[
+globals [
   tumorcell-count
+
   Chrom1-final
   Chrom2-final
   Chrom3-final
@@ -29,8 +27,17 @@ globals
   Chrom22-final
   ChromX-final
   x
-  CIN-rate
-  total-misseg
+
+  best-difference
+  best-threshold
+  remaining-fraction
+  difference
+  iterations
+  plusminus
+  best-pressure
+  max-population
+  averaging-steps
+  averaging-list
 ]
 
 tumorcells-own
@@ -57,7 +64,7 @@ tumorcells-own
   MChrom20
   MChrom21
   MChrom22
-  MChromX ;----------------------------------------------------------
+  MChromX ;--------------
 
   PChrom1 ;--------------------------------- Paternal chromosome attribute
   PChrom2
@@ -81,7 +88,7 @@ tumorcells-own
   PChrom20
   PChrom21
   PChrom22
-  PChromX;----------------------------------------------------------
+  PChromX;--------------
 
   Chrom1 ;--------------------------------- Maternal + Paternal chromosome attribute
   Chrom2
@@ -105,7 +112,7 @@ tumorcells-own
   Chrom20
   Chrom21
   Chrom22
-  ChromX;----------------------------------------------------------
+  ChromX;--------------
 
   MP1 ;------------------ Probability that a maternal chromosome is missegregated
   MP2
@@ -129,7 +136,7 @@ tumorcells-own
   MP20
   MP21
   MP22
-  MPX ;---------------------------------------------------
+  MPX ;-------
 
 
   PP1 ;------------------ Probability that a paternal chromosome is missegregated
@@ -154,9 +161,9 @@ tumorcells-own
   PP20
   PP21
   PP22
-  PPX;---------------------------------------------------
+  PPX;-------
 
-  MGL1 ;-------------------------------------------------- Maternal gain/loss action attribute
+  MGL1 ;------ Maternal gain/loss action attribute
   MGL2
   MGL3
   MGL4
@@ -178,9 +185,9 @@ tumorcells-own
   MGL20
   MGL21
   MGL22
-  MGLX ;---------------------------------------------------
+  MGLX ;-------
 
-  PGL1 ;-------------------------------------------------- Paternal gain/loss action attribute
+  PGL1 ;------ Paternal gain/loss action attribute
   PGL2
   PGL3
   PGL4
@@ -252,7 +259,7 @@ tumorcells-own
   pmiseg22
   pmisegX
 
-  Fc1 ;--------------------------------------------------- normalized gene values for each chromosome
+  Fc1 ;------- normalized gene values for each chromosome
   Fc2
   Fc3
   Fc4
@@ -298,8 +305,6 @@ tumorcells-own
   fitd21
   fitd22
   fitdx ;-------------------------------------end
-
-  totalmisseg
   chromavg
   karyotype
   CIN-level
@@ -308,63 +313,26 @@ tumorcells-own
 ]
 
 to setup
-  clear-all
+  ;clear-all
+  clear-turtles
   set-default-shape tumorcells "circle"
   setup-progenitor
   reset-ticks
-  translate-cin-rates
 end
 
-to translate-cin-rates
-if initial-CIN = 0
-    [
-      set CIN-rate 0
-    ]
-if initial-CIN = 1
-    [
-      set CIN-rate (10 / 3680)
-    ]
-if initial-CIN = 2
-    [
-      set CIN-rate (10 / 1840)
-    ]
-if initial-CIN = 3
-    [
-      set CIN-rate (10 / 920)
-    ]
-if initial-CIN = 4
-    [
-      set CIN-rate (10 / 460)
-    ]
-if initial-CIN = 5
-    [
-      set CIN-rate (10 / 230)
-    ]
-if initial-CIN = 6
-    [
-      set CIN-rate (10 / 120)
-    ]
-if initial-CIN = 7
-    [
-      set CIN-rate (10 / 60)
-    ]
-if initial-CIN = 8
-    [
-      set CIN-rate (10 / 30)
-    ]
-if initial-CIN = 9
-    [
-      set CIN-rate (10 / 20)
-    ]
-if initial-CIN = 10
-    [
-      set CIN-rate (10 / 15)
-    ]
+to setup-globals
+  set best-difference 1
+  set best-threshold 1
+  set best-pressure 1
+  set iterations 0
+  set plusminus random 2
+  set averaging-list [ ]
+  set max-population 1
 end
-
 
 to setup-progenitor
   create-tumorcells initial-number
+  reset-average-steps
   ask tumorcells
   [
     set CIN-level 0
@@ -484,13 +452,44 @@ to setup-progenitor
   ]
 end
 
+to reset-average-steps
+ask tumorcells
+  [
+    if averaging-steps >= interval-size
+    [
+   ; ifelse iterations < 500
+    ;[set pressure-threshold (random 1000) / 1000]
+      ;[set pressure-threshold pressure-threshold + 0.01]
+    ;[ifelse plusminus = 0
+    ;[set pressure-threshold best-threshold + (random 100) / 1000]
+    ;[set pressure-threshold best-threshold - (random 100) / 1000]]
+    set selective-pressure selective-pressure + 1
+  ]
+  ]
+  if averaging-steps >= interval-size
+  [
+    set averaging-steps 0
+    set iterations iterations + 1
+    setup
+    if mean averaging-list < best-difference
+    [
+      set best-difference mean averaging-list
+      print (word "Best Difference:" mean averaging-list"")
+      set best-threshold pressure-threshold
+      set best-pressure selective-pressure
+    ]
+    set averaging-list [ ]
+
+  ]
+
+end
+
 to go
-if end-ticks - start-cin = 1[
-  ask tumorcells
-[
-calculate-missegregations
-  ]]
 if (ticks < 1) [ reset-timer ]
+if averaging-steps >= interval-size
+[
+    reset-average-steps
+  ]
 tick
 if (ticks >= start-cin)
   [
@@ -498,75 +497,59 @@ if (ticks >= start-cin)
     [
       set CIN-level initial-CIN
   ]]
-if ticks = end-ticks or count tumorcells >= end-population
-  [
-    show (word "Execution  finished  in " timer " seconds ")
-    output-chromosome-state
-    stop
+
+    if count tumorcells > max-population
+ [
+   set max-population count tumorcells
   ]
+
   check-death
   calculate-chromosome-scores
   calculate-fitness
   assign-resources
   assign-cin
   reset-division-state
-
   ask tumorcells[
     if resources >= 100
     [
       mitosis1
       mitosis2
-  ]]
+    ]]
 
+  if ticks = end-ticks or count tumorcells >= end-population
+  [
+    show (word "Execution  finished  in " timer " seconds ")
+    set averaging-steps averaging-steps + 1
+    calculate-fitness
+    check-death
+    ask tumorcells
+    [
+      if fitness < pressure-threshold [die]
+    ]
+
+    calculate-eck
+    print(word "Remaining "count tumorcells"")
+    output-chromosome-state
+    ;stop
+    ;print (word "Difference "difference"" )
+    ;print (word "Best Difference "best-difference"" )
+    ;print (word "Remaining Fraction "remaining-fraction"")
+    ;print (word "Best Threshold "best-threshold"")
+    ;print(word "Iterations "iterations"")
+    ;print(word "Best Pressure "best-pressure"")
+  ]
+
+  if ticks = end-ticks or count tumorcells >= end-population
+  [
+   setup
+  ]
 end
 
-to calculate-missegregations
-set totalmisseg (abs(mchrom1 - 1) +
-    abs(mchrom2 - 1) +
-    abs(mchrom3 - 1) +
-    abs(mchrom4 - 1) +
-    abs(mchrom5 - 1) +
-    abs(mchrom6 - 1) +
-    abs(mchrom7 - 1) +
-    abs(mchrom8 - 1) +
-    abs(mchrom9 - 1) +
-    abs(mchrom10 - 1) +
-    abs(mchrom11 - 1) +
-    abs(mchrom12 - 1) +
-    abs(mchrom13 - 1) +
-    abs(mchrom14 - 1) +
-    abs(mchrom15 - 1) +
-    abs(mchrom16 - 1) +
-    abs(mchrom17 - 1) +
-    abs(mchrom18 - 1) +
-    abs(mchrom19 - 1) +
-    abs(mchrom20 - 1) +
-    abs(mchrom21 - 1) +
-    abs(mchrom22 - 1) +
-    abs(mchromx - 1) +
-    abs(pchrom1 - 1) +
-    abs(pchrom2 - 1) +
-    abs(pchrom3 - 1) +
-    abs(pchrom4 - 1) +
-    abs(pchrom5 - 1) +
-    abs(pchrom6 - 1) +
-    abs(pchrom7 - 1) +
-    abs(pchrom8 - 1) +
-    abs(pchrom9 - 1) +
-    abs(pchrom10 - 1) +
-    abs(pchrom11 - 1) +
-    abs(pchrom12 - 1) +
-    abs(pchrom13 - 1) +
-    abs(pchrom14 - 1) +
-    abs(pchrom15 - 1) +
-    abs(pchrom16 - 1) +
-    abs(pchrom17 - 1) +
-    abs(pchrom18 - 1) +
-    abs(pchrom19 - 1) +
-    abs(pchrom20 - 1) +
-    abs(pchrom21 - 1) +
-    abs(pchrom22 - 1) +
-    abs(pchromx - 1))
+to calculate-eck
+  check-death
+  set remaining-fraction (count tumorcells / max-population)
+  set difference abs(remaining-fraction - k)
+  set averaging-list lput difference averaging-list
 end
 
 to reset-division-state
@@ -623,7 +606,7 @@ end
 
 to assign-resources
   ask tumorcells
-  [ifelse fitness >= 1.0
+  [ifelse fitness >= 0.
     [set resources resources + 50]
     [ifelse fitness >= 0.9
       [set resources resources + 45]
@@ -651,32 +634,136 @@ to assign-cin
       ;-------------------------------------- Set paternal gain/loss probabilities
   ask tumorcells[
     if CIN-level = 0 [
-    set PP1 999
-    set PP2 999
-    set PP3 999
-    set PP4 999
-    set PP5 999
-    set PP6 999
-    set PP7 999
-    set PP8 999
-    set PP9 999
-    set PP10 999
-    set PP11 999
-    set PP12 999
-    set PP13 999
-    set PP14 999
-    set PP15 999
-    set PP16 999
-    set PP17 999
-    set PP18 999
-    set PP19 999
-    set PP20 999
-    set PP21 999
-    set PP22 999
-    set PPX 999
+    set PP1 99999
+    set PP2 99999
+    set PP3 99999
+    set PP4 99999
+    set PP5 99999
+    set PP6 99999
+    set PP7 99999
+    set PP8 99999
+    set PP9 99999
+    set PP10 99999
+    set PP11 99999
+    set PP12 99999
+    set PP13 99999
+    set PP14 99999
+    set PP15 99999
+    set PP16 99999
+    set PP17 99999
+    set PP18 99999
+    set PP19 99999
+    set PP20 99999
+    set PP21 99999
+    set PP22 99999
+    set PPX 99999
     ]
 
-     if CIN-level = 1 [
+        if CIN-level = 1 [
+    set PP1 58880
+    set PP2 58880
+    set PP3 58880
+    set PP4 58880
+    set PP5 58880
+    set PP6 58880
+    set PP7 58880
+    set PP8 58880
+    set PP9 58880
+    set PP10 58880
+    set PP11 58880
+    set PP12 58880
+    set PP13 58880
+    set PP14 58880
+    set PP15 58880
+    set PP16 58880
+    set PP17 58880
+    set PP18 58880
+    set PP19 58880
+    set PP20 58880
+    set PP21 58880
+    set PP22 58880
+    set PPX 58880
+    ]
+
+        if CIN-level = 2 [
+    set PP1 29440
+    set PP2 29440
+    set PP3 29440
+    set PP4 29440
+    set PP5 29440
+    set PP6 29440
+    set PP7 29440
+    set PP8 29440
+    set PP9 29440
+    set PP10 29440
+    set PP11 29440
+    set PP12 29440
+    set PP13 29440
+    set PP14 29440
+    set PP15 29440
+    set PP16 29440
+    set PP17 29440
+    set PP18 29440
+    set PP19 29440
+    set PP20 29440
+    set PP21 29440
+    set PP22 29440
+    set PPX 29440
+    ]
+
+        if CIN-level = 3 [
+    set PP1 14720
+    set PP2 14720
+    set PP3 14720
+    set PP4 14720
+    set PP5 14720
+    set PP6 14720
+    set PP7 14720
+    set PP8 14720
+    set PP9 14720
+    set PP10 14720
+    set PP11 14720
+    set PP12 14720
+    set PP13 14720
+    set PP14 14720
+    set PP15 14720
+    set PP16 14720
+    set PP17 14720
+    set PP18 14720
+    set PP19 14720
+    set PP20 14720
+    set PP21 14720
+    set PP22 14720
+    set PPX 14720
+    ]
+
+        if CIN-level = 4 [
+    set PP1 7360
+    set PP2 7360
+    set PP3 7360
+    set PP4 7360
+    set PP5 7360
+    set PP6 7360
+    set PP7 7360
+    set PP8 7360
+    set PP9 7360
+    set PP10 7360
+    set PP11 7360
+    set PP12 7360
+    set PP13 7360
+    set PP14 7360
+    set PP15 7360
+    set PP16 7360
+    set PP17 7360
+    set PP18 7360
+    set PP19 7360
+    set PP20 7360
+    set PP21 7360
+    set PP22 7360
+    set PPX 7360
+    ]
+
+     if CIN-level = 5 [
     set PP1 random 3680
     set PP2 random 3680
     set PP3 random 3680
@@ -702,7 +789,7 @@ to assign-cin
     set PPX random 3680
     ]
 
-    if CIN-level = 2 [
+    if CIN-level = 6 [
     set PP1 random 1840
     set PP2 random 1840
     set PP3 random 1840
@@ -728,7 +815,7 @@ to assign-cin
       set PPX random 1840
     ]
 
-    if CIN-level = 3 [
+    if CIN-level = 7 [
     set PP1 random 920
     set PP2 random 920
     set PP3 random 920
@@ -754,7 +841,7 @@ to assign-cin
       set PPX random 920
     ]
 
-    if CIN-level = 4 [
+    if CIN-level = 8 [
     set PP1 random 460
     set PP2 random 460
     set PP3 random 460
@@ -780,7 +867,7 @@ to assign-cin
       set PPX random 460
     ]
 
-    if CIN-level = 5 [
+    if CIN-level = 9 [
     set PP1 random 230
     set PP2 random 230
     set PP3 random 230
@@ -806,7 +893,7 @@ to assign-cin
       set PPX random 230
     ]
 
-    if CIN-level = 6 [
+    if CIN-level = 10 [
     set PP1 random 120
     set PP2 random 120
     set PP3 random 120
@@ -832,7 +919,7 @@ to assign-cin
       set PPX random 120
     ]
 
-    if CIN-level = 7 [
+    if CIN-level = 11[
     set PP1 random 60
     set PP2 random 60
     set PP3 random 60
@@ -858,7 +945,7 @@ to assign-cin
       set PPX random 60
     ]
 
-    if CIN-level = 8 [
+    if CIN-level = 12 [
     set PP1 random 30
     set PP2 random 30
     set PP3 random 30
@@ -881,10 +968,10 @@ to assign-cin
     set PP20 random 30
     set PP21 random 30
     set PP22 random 30
-    set PPX random 30
+      set PPX random 30
     ]
 
-      if CIN-level = 9 [
+      if CIN-level = 13 [
     set PP1 random 20
     set PP2 random 20
     set PP3 random 20
@@ -906,11 +993,10 @@ to assign-cin
     set PP19 random 20
     set PP20 random 20
     set PP21 random 20
-    set PP22 random 20
-    set PPX random 20
+      set PPX random 20
     ]
 
-          if CIN-level = 10 [
+     if CIN-level = 14 [
     set PP1 random 15
     set PP2 random 15
     set PP3 random 15
@@ -932,36 +1018,8 @@ to assign-cin
     set PP19 random 15
     set PP20 random 15
     set PP21 random 15
-    set PP22 random 15
       set PPX random 15
     ]
-
-    if CIN-level = 11 [
-    set PP1 random 10
-    set PP2 random 10
-    set PP3 random 10
-    set PP4 random 10
-    set PP5 random 10
-    set PP6 random 10
-    set PP7 random 10
-    set PP8 random 10
-    set PP9 random 10
-    set PP10 random 10
-    set PP11 random 10
-    set PP12 random 10
-    set PP13 random 10
-    set PP14 random 10
-    set PP15 random 10
-    set PP16 random 10
-    set PP17 random 10
-    set PP18 random 10
-    set PP19 random 10
-    set PP20 random 10
-    set PP21 random 10
-    set PP22 random 10
-      set PPX random 10
-    ]
-
 
     set PGL1 random 2
     set PGL2 random 2
@@ -989,32 +1047,136 @@ to assign-cin
 
     ;----------------------------- Set maternal gain/loss probability
     if CIN-level = 0 [
-    set MP1 999
-    set MP2 999
-    set MP3 999
-    set MP4 999
-    set MP5 999
-    set MP6 999
-    set MP7 999
-    set MP8 999
-    set MP9 999
-    set MP10 999
-    set MP11 999
-    set MP12 999
-    set MP13 999
-    set MP14 999
-    set MP15 999
-    set MP16 999
-    set MP17 999
-    set MP18 999
-    set MP19 999
-    set MP20 999
-    set MP21 999
-    set MP22 999
-    set MPX 999
+    set MP1 99999
+    set MP2 99999
+    set MP3 99999
+    set MP4 99999
+    set MP5 99999
+    set MP6 99999
+    set MP7 99999
+    set MP8 99999
+    set MP9 99999
+    set MP10 99999
+    set MP11 99999
+    set MP12 99999
+    set MP13 99999
+    set MP14 99999
+    set MP15 99999
+    set MP16 99999
+    set MP17 99999
+    set MP18 99999
+    set MP19 99999
+    set MP20 99999
+    set MP21 99999
+    set MP22 99999
+    set MPX 99999
     ]
 
      if CIN-level = 1 [
+    set MP1 58880
+    set MP2 58880
+    set MP3 58880
+    set MP4 58880
+    set MP5 58880
+    set MP6 58880
+    set MP7 58880
+    set MP8 58880
+    set MP9 58880
+    set MP10 58880
+    set MP11 58880
+    set MP12 58880
+    set MP13 58880
+    set MP14 58880
+    set MP15 58880
+    set MP16 58880
+    set MP17 58880
+    set MP18 58880
+    set MP19 58880
+    set MP20 58880
+    set MP21 58880
+    set MP22 58880
+    set MPX 58880
+    ]
+
+     if CIN-level = 2 [
+    set MP1 29440
+    set MP2 29440
+    set MP3 29440
+    set MP4 29440
+    set MP5 29440
+    set MP6 29440
+    set MP7 29440
+    set MP8 29440
+    set MP9 29440
+    set MP10 29440
+    set MP11 29440
+    set MP12 29440
+    set MP13 29440
+    set MP14 29440
+    set MP15 29440
+    set MP16 29440
+    set MP17 29440
+    set MP18 29440
+    set MP19 29440
+    set MP20 29440
+    set MP21 29440
+    set MP22 29440
+    set MPX 29440
+    ]
+
+     if CIN-level = 3 [
+    set MP1 14720
+    set MP2 14720
+    set MP3 14720
+    set MP4 14720
+    set MP5 14720
+    set MP6 14720
+    set MP7 14720
+    set MP8 14720
+    set MP9 14720
+    set MP10 14720
+    set MP11 14720
+    set MP12 14720
+    set MP13 14720
+    set MP14 14720
+    set MP15 14720
+    set MP16 14720
+    set MP17 14720
+    set MP18 14720
+    set MP19 14720
+    set MP20 14720
+    set MP21 14720
+    set MP22 14720
+    set MPX 14720
+    ]
+
+     if CIN-level = 4 [
+    set MP1 7360
+    set MP2 7360
+    set MP3 7360
+    set MP4 7360
+    set MP5 7360
+    set MP6 7360
+    set MP7 7360
+    set MP8 7360
+    set MP9 7360
+    set MP10 7360
+    set MP11 7360
+    set MP12 7360
+    set MP13 7360
+    set MP14 7360
+    set MP15 7360
+    set MP16 7360
+    set MP17 7360
+    set MP18 7360
+    set MP19 7360
+    set MP20 7360
+    set MP21 7360
+    set MP22 7360
+    set MPX 7360
+    ]
+
+     if CIN-level = 5 [
     set MP1 random 3680
     set MP2 random 3680
     set MP3 random 3680
@@ -1040,7 +1202,7 @@ to assign-cin
     set MPX random 3680
     ]
 
-    if CIN-level = 2 [
+    if CIN-level = 6 [
     set MP1 random 1840
     set MP2 random 1840
     set MP3 random 1840
@@ -1066,7 +1228,7 @@ to assign-cin
       set MPX random 1840
     ]
 
-    if CIN-level = 3 [
+    if CIN-level = 7 [
     set MP1 random 920
     set MP2 random 920
     set MP3 random 920
@@ -1092,7 +1254,7 @@ to assign-cin
       set MPX random 920
     ]
 
-    if CIN-level = 4 [
+    if CIN-level = 8 [
     set MP1 random 460
     set MP2 random 460
     set MP3 random 460
@@ -1118,7 +1280,7 @@ to assign-cin
       set MPX random 460
     ]
 
-    if CIN-level = 5 [
+    if CIN-level = 9 [
     set MP1 random 230
     set MP2 random 230
     set MP3 random 230
@@ -1144,7 +1306,7 @@ to assign-cin
       set MPX random 230
     ]
 
-    if CIN-level = 6 [
+    if CIN-level = 10 [
     set MP1 random 120
     set MP2 random 120
     set MP3 random 120
@@ -1170,7 +1332,7 @@ to assign-cin
       set MPX random 120
     ]
 
-    if CIN-level = 7 [
+    if CIN-level = 11 [
     set MP1 random 60
     set MP2 random 60
     set MP3 random 60
@@ -1196,7 +1358,7 @@ to assign-cin
       set MPX random 60
     ]
 
-    if CIN-level = 8 [
+    if CIN-level = 12 [
     set MP1 random 30
     set MP2 random 30
     set MP3 random 30
@@ -1222,7 +1384,7 @@ to assign-cin
       set MPX random 30
     ]
 
-      if CIN-level = 9 [
+      if CIN-level = 13 [
     set MP1 random 20
     set MP2 random 20
     set MP3 random 20
@@ -1244,11 +1406,10 @@ to assign-cin
     set MP19 random 20
     set MP20 random 20
     set MP21 random 20
-      set MP22 random 20
       set MPX random 20
     ]
 
-   if CIN-level = 10 [
+          if CIN-level = 14 [
     set MP1 random 15
     set MP2 random 15
     set MP3 random 15
@@ -1270,34 +1431,7 @@ to assign-cin
     set MP19 random 15
     set MP20 random 15
     set MP21 random 15
-    set MP22 random 15
-    set MPX random 15
-    ]
-
-    if CIN-level = 11 [
-    set MP1 random 10
-    set MP2 random 10
-    set MP3 random 10
-    set MP4 random 10
-    set MP5 random 10
-    set MP6 random 10
-    set MP7 random 10
-    set MP8 random 10
-    set MP9 random 10
-    set MP10 random 10
-    set MP11 random 10
-    set MP12 random 10
-    set MP13 random 10
-    set MP14 random 10
-    set MP15 random 10
-    set MP16 random 10
-    set MP17 random 10
-    set MP18 random 10
-    set MP19 random 10
-    set MP20 random 10
-    set MP21 random 10
-    set MP22 random 10
-      set MPX random 10
+      set MPX random 15
     ]
 
     set MGL1 random 2
@@ -2302,7 +2436,7 @@ end
 to check-death
   ask tumorcells [
     if resources <= 0 [die]
-    if fitness <= 0 [die]
+    if fitness <= pressure-threshold [die]
 
     if Chrom1 <= 0  [die]
     if Chrom2 <= 0  [die]
@@ -2352,16 +2486,13 @@ to check-death
     if Chrom22 >= 13 [die]
     if ChromX >= 13  [die]
   ]
-  ask n-of (count tumorcells / 2) tumorcells [
-    if count tumorcells >= 1000 [die]
-  ]
 end
 
 to output-chromosome-state
  set x count tumorcells
 
   let selected-tumorcells ifelse-value (x >= 100)
-  [n-of outputcount tumorcells]
+  [n-of 100 tumorcells]
   [n-of count tumorcells tumorcells]
 
   set Chrom1-final [Chrom1] of selected-tumorcells
@@ -2387,8 +2518,6 @@ to output-chromosome-state
   set Chrom21-final [Chrom21] of selected-tumorcells
   set Chrom22-final [Chrom22] of selected-tumorcells
   set ChromX-final [ChromX] of selected-tumorcells
-  set total-misseg [totalmisseg] of selected-tumorcells
-  print total-misseg
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -2455,29 +2584,29 @@ NIL
 0
 
 SLIDER
-21
-80
-193
-113
+20
+115
+192
+148
 initial-CIN
 initial-CIN
 0
-11
-10.0
+14
+12.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-21
-45
-193
-78
+20
+80
+192
+113
 initial-number
 initial-number
 1
-1
+10
 1.0
 1
 1
@@ -2485,9 +2614,9 @@ NIL
 HORIZONTAL
 
 MONITOR
-227
+465
 10
-305
+543
 55
 Cell Count
 count turtles
@@ -2496,10 +2625,10 @@ count turtles
 11
 
 SWITCH
-20
-220
-123
-253
+195
+185
+298
+218
 SAC
 SAC
 1
@@ -2524,10 +2653,10 @@ NIL
 1
 
 SWITCH
-20
-184
-184
-217
+19
+219
+183
+252
 show-resources?
 show-resources?
 1
@@ -2557,40 +2686,11 @@ PENS
 "pen-4" 1.0 0 -6459832 true "" "plot mean [ Chrom7 ] of tumorcells"
 "pen-5" 1.0 0 -1184463 true "" "plot mean [ chrom9 ] of tumorcells"
 
-TEXTBOX
-375
-15
-505
-205
-CIN RATES:  \nProbability of missegregation for each individual chromosome\n0 = no CIN\n1 = 1/368\n2 = 1/184\n3 = 1/92\n4 = 1/46\n5 = 1/23\n6 = 2/23\n7 = 4/23\n8 = 8/23
-10
-0.0
-1
-
 PLOT
-232
-259
-456
-431
-Average Ploidy
-Time
-# Chromosomes
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot mean [ karyotype ] of tumorcells / 23"
-"pen-1" 1.0 0 -8053223 true "" "plot median [ karyotype ] of tumorcells / 23"
-
-PLOT
-0
-260
-231
-430
+-1
+288
+230
+464
 Total Population v time
 NIL
 NIL
@@ -2606,38 +2706,19 @@ PENS
 "pen-1" 1.0 0 -8053223 true "" "plot count turtles with [karyotype / 23 != initial-ploidy]"
 
 SLIDER
-20
-150
-194
-183
+19
+185
+193
+218
 end-population
 end-population
 1000
 200000
-400000.0
+200000.0
 1000
 1
 NIL
 HORIZONTAL
-
-PLOT
-455
-260
-690
-430
-Average Fitness
-NIL
-NIL
-0.0
-10.0
-0.0
-2.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot mean [ fitness ] of tumorcells"
-"pen-1" 1.0 0 -7500403 true "" ""
 
 SLIDER
 193
@@ -2648,17 +2729,17 @@ selective-pressure
 selective-pressure
 0
 100
-100.0
+9.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-190
-210
-340
-243
+275
+45
+425
+78
 Kill Aneuploid Cells
 if Chrom1 != initial-ploidy [die]\nif Chrom2 != initial-ploidy [die]\nif Chrom3 != initial-ploidy [die]\nif Chrom4 != initial-ploidy [die]\nif Chrom5 != initial-ploidy [die]\nif Chrom6 != initial-ploidy [die]\nif Chrom7 != initial-ploidy [die]\nif Chrom8 != initial-ploidy [die]\nif Chrom9 != initial-ploidy [die]\nif Chrom10 != initial-ploidy [die]\nif Chrom11 != initial-ploidy [die]\nif Chrom12 != initial-ploidy [die]\nif Chrom13 != initial-ploidy [die]\nif Chrom14 != initial-ploidy [die]\nif Chrom15 != initial-ploidy [die]\nif Chrom16 != initial-ploidy [die]\nif Chrom17 != initial-ploidy [die]\nif Chrom18 != initial-ploidy [die]\nif Chrom19 != initial-ploidy [die]\nif Chrom20 != initial-ploidy [die]\nif Chrom21 != initial-ploidy [die]\nif Chrom22 != initial-ploidy [die]\nif ChromX != initial-ploidy [die]
 NIL
@@ -2672,10 +2753,10 @@ NIL
 1
 
 BUTTON
-198
-177
-331
-210
+140
+45
+273
+78
 Kill Euploid Cells
 if Chrom1 = initial-ploidy and \nChrom2 = initial-ploidy and\nChrom3 = initial-ploidy and\nChrom4 = initial-ploidy and\nChrom5 = initial-ploidy and\nChrom6 = initial-ploidy and\nChrom7 = initial-ploidy and\nChrom8 = initial-ploidy and\nChrom9 = initial-ploidy and\nChrom10 = initial-ploidy and\nChrom11 = initial-ploidy and\nChrom12 = initial-ploidy and\nChrom13 = initial-ploidy and\nChrom14 = initial-ploidy and\nChrom15 = initial-ploidy and\nChrom16 = initial-ploidy and\nChrom17 = initial-ploidy and\nChrom18 = initial-ploidy and\nChrom19 = initial-ploidy and\nChrom20 = initial-ploidy and\nChrom21 = initial-ploidy and\nChrom22 = initial-ploidy and\nChromX = initial-ploidy [die]
 NIL
@@ -2688,22 +2769,37 @@ NIL
 NIL
 1
 
+SLIDER
+195
+115
+365
+148
+start-cin
+start-cin
+0
+20
+10.0
+1
+1
+NIL
+HORIZONTAL
+
 INPUTBOX
 455
 75
 684
 135
 end-ticks
-16.0
+11.0
 1
 0
 Number
 
 BUTTON
-250
-440
-382
-473
+310
+10
+442
+43
 Kill fitness < 0.5
 if fitness < 0.5 [die]
 T
@@ -2818,29 +2914,11 @@ NIL
 NIL
 1
 
-PLOT
-455
-140
-690
-260
-Average Karyotype
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot mean [ karyotype ] of tumorcells"
-
 SLIDER
-20
-115
-192
-148
+19
+150
+191
+183
 initial-ploidy
 initial-ploidy
 0
@@ -2851,50 +2929,113 @@ initial-ploidy
 NIL
 HORIZONTAL
 
-PLOT
+SLIDER
+195
+150
+372
+183
+pressure-threshold
+pressure-threshold
 0
-430
+1
+0.5
+0.05
+1
+NIL
+HORIZONTAL
+
+INPUTBOX
+465
+135
+535
+195
+k
+0.3
+1
+0
+Number
+
+BUTTON
+225
+10
+307
+43
+NIL
+clear-all
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+20
+45
+137
+78
+NIL
+setup-globals
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+PLOT
+260
 230
-585
-plot 1
+505
+415
+Difference and Threshold
 NIL
 NIL
 0.0
-10.0
+20.0
 0.0
-10.0
+1.0
 true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot count turtles with [chrom1 < 0]"
-"pen-1" 1.0 0 -12087248 true "" "plot count turtles with [chrom2 < 0]"
-"pen-2" 1.0 0 -7500403 true "" "plot count turtles with [chrom3 < 0]"
-"pen-3" 1.0 0 -2674135 true "" "plot count turtles with [chrom4 < 0]"
-"pen-4" 1.0 0 -955883 true "" "plot count turtles with [chrom5 < 0]"
-"pen-5" 1.0 0 -6459832 true "" "plot count turtles with [chrom6 < 0]"
+"default" 1.0 0 -16777216 true "" "plot best-threshold"
+"pen-1" 1.0 0 -7500403 true "" "plot best-difference"
 
 INPUTBOX
+535
+135
+682
 195
-115
-365
-175
-start-cin
-15.0
+interval-size
+50.0
 1
 0
 Number
 
-INPUTBOX
-350
-190
-445
-250
-outputcount
-38.0
-1
-0
-Number
+PLOT
+505
+230
+705
+380
+Fitness
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot mean [fitness] of tumorcells "
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -3572,7 +3713,6 @@ need-to-manually-make-preview-for-this-model
     <go>go</go>
     <metric>count tumorcells</metric>
     <metric>count turtles with [karyotype / 23 != initial-ploidy]</metric>
-    <metric>CIN-rate</metric>
     <metric>Chrom1-final</metric>
     <metric>Chrom2-final</metric>
     <metric>Chrom3-final</metric>
@@ -3640,85 +3780,10 @@ need-to-manually-make-preview-for-this-model
       <value value="13"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="CINModelSteadyState" repetitions="10" runMetricsEveryStep="false">
+  <experiment name="CINModelPressureThrottle" repetitions="5" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
     <metric>count tumorcells</metric>
-    <metric>CIN-rate</metric>
-    <metric>count turtles with [karyotype / 23 != initial-ploidy]</metric>
-    <metric>Chrom1-final</metric>
-    <metric>Chrom2-final</metric>
-    <metric>Chrom3-final</metric>
-    <metric>Chrom4-final</metric>
-    <metric>Chrom5-final</metric>
-    <metric>Chrom6-final</metric>
-    <metric>Chrom7-final</metric>
-    <metric>Chrom8-final</metric>
-    <metric>Chrom9-final</metric>
-    <metric>Chrom10-final</metric>
-    <metric>Chrom11-final</metric>
-    <metric>Chrom12-final</metric>
-    <metric>Chrom13-final</metric>
-    <metric>Chrom14-final</metric>
-    <metric>Chrom15-final</metric>
-    <metric>Chrom16-final</metric>
-    <metric>Chrom17-final</metric>
-    <metric>Chrom18-final</metric>
-    <metric>Chrom19-final</metric>
-    <metric>Chrom20-final</metric>
-    <metric>Chrom21-final</metric>
-    <metric>Chrom22-final</metric>
-    <metric>ChromX-final</metric>
-    <enumeratedValueSet variable="initial-number">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="SAC">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="show-resources?">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-CIN">
-      <value value="0"/>
-      <value value="1"/>
-      <value value="2"/>
-      <value value="3"/>
-      <value value="4"/>
-      <value value="5"/>
-      <value value="6"/>
-      <value value="7"/>
-      <value value="8"/>
-      <value value="9"/>
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-ploidy">
-      <value value="2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="selective-pressure">
-      <value value="0"/>
-      <value value="1"/>
-      <value value="10"/>
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-ticks">
-      <value value="16"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-population">
-      <value value="400000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="start-cin">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="outputcount">
-      <value value="38"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="CINModelSteadyStateTest" repetitions="10" runMetricsEveryStep="false">
-    <setup>setup</setup>
-    <go>go</go>
-    <metric>count tumorcells</metric>
-    <metric>CIN-rate</metric>
-    <metric>total-misseg</metric>
     <metric>count turtles with [karyotype / 23 != initial-ploidy]</metric>
     <metric>Chrom1-final</metric>
     <metric>Chrom2-final</metric>
@@ -3765,82 +3830,40 @@ need-to-manually-make-preview-for-this-model
       <value value="9"/>
       <value value="10"/>
       <value value="11"/>
+      <value value="12"/>
+      <value value="13"/>
+      <value value="14"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="initial-ploidy">
       <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="selective-pressure">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-ticks">
-      <value value="16"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-population">
-      <value value="400000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="start-cin">
-      <value value="15"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="MissegBias5000Gen" repetitions="1" runMetricsEveryStep="false">
-    <setup>setup</setup>
-    <go>go</go>
-    <metric>count tumorcells</metric>
-    <metric>CIN-rate</metric>
-    <metric>total-misseg</metric>
-    <metric>count turtles with [karyotype / 23 != initial-ploidy]</metric>
-    <metric>Chrom1-final</metric>
-    <metric>Chrom2-final</metric>
-    <metric>Chrom3-final</metric>
-    <metric>Chrom4-final</metric>
-    <metric>Chrom5-final</metric>
-    <metric>Chrom6-final</metric>
-    <metric>Chrom7-final</metric>
-    <metric>Chrom8-final</metric>
-    <metric>Chrom9-final</metric>
-    <metric>Chrom10-final</metric>
-    <metric>Chrom11-final</metric>
-    <metric>Chrom12-final</metric>
-    <metric>Chrom13-final</metric>
-    <metric>Chrom14-final</metric>
-    <metric>Chrom15-final</metric>
-    <metric>Chrom16-final</metric>
-    <metric>Chrom17-final</metric>
-    <metric>Chrom18-final</metric>
-    <metric>Chrom19-final</metric>
-    <metric>Chrom20-final</metric>
-    <metric>Chrom21-final</metric>
-    <metric>Chrom22-final</metric>
-    <metric>ChromX-final</metric>
-    <enumeratedValueSet variable="initial-number">
       <value value="1"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="SAC">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="show-resources?">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-CIN">
+    <enumeratedValueSet variable="pressure-threshold">
       <value value="0"/>
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-ploidy">
-      <value value="2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="selective-pressure">
-      <value value="2"/>
+      <value value="0.1"/>
+      <value value="0.2"/>
+      <value value="0.3"/>
+      <value value="0.4"/>
+      <value value="0.5"/>
+      <value value="0.6"/>
+      <value value="0.7"/>
+      <value value="0.8"/>
+      <value value="0.9"/>
+      <value value="0.95"/>
+      <value value="0.99"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="end-ticks">
-      <value value="515"/>
-      <value value="1015"/>
-      <value value="5015"/>
+      <value value="11"/>
+      <value value="12"/>
+      <value value="13"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="end-population">
-      <value value="400000"/>
+      <value value="200000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="start-cin">
-      <value value="15"/>
+      <value value="10"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>

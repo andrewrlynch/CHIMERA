@@ -1,5 +1,3 @@
-;Changes to v10 from v9: Add more CIN levels and probability for same chromosome missegregating twice.
-
 breed [tumorcells tumorcell]
 
 globals
@@ -303,7 +301,7 @@ tumorcells-own
   chromavg
   karyotype
   CIN-level
-  resources
+  MitosisProbability
   fitness
 ]
 
@@ -312,6 +310,7 @@ to setup
   set-default-shape tumorcells "circle"
   setup-progenitor
   reset-ticks
+  setup-progenitor-attributes
   translate-cin-rates
 end
 
@@ -367,9 +366,8 @@ to setup-progenitor
   create-tumorcells initial-number
   ask tumorcells
   [
-    set CIN-level 0
-    set resources 50
-
+    set CIN-level initial-CIN
+    set MitosisProbability random 100
     set karyotype (initial-ploidy) * 23
 
     set MChrom1 initial-ploidy / 2
@@ -467,57 +465,62 @@ to setup-progenitor
     set Fc21 0.015
     set Fc22 0.022
     set Fcx 0.041
+  ]
 
+end
+
+to setup-progenitor-attributes
+  ask tumorcells [
   calculate-chromosome-scores
   calculate-fitness
-
-    if fitness >= 0.8 [set color 19.9]
-    if fitness < 0.8 [set color 19.9 - 0.5]
-    if fitness < 0.75 [set color 19.9 - 1.0]
-    if fitness < 0.7 [set color 19.9 - 1.5]
-    if fitness < 0.65 [set color 19.9 - 2.5]
-    if fitness < 0.6 [set color 19.9 - 2.5]
-    if fitness < 0.55 [set color 19.9 - 3.0]
-    if fitness < 0.5 [set color 19.9 - 3.5]
-    if fitness < 0.45 [set color 19.9 - 4.0]
-    if fitness < 0.4 [set color 19.9 - 4.5]
+  set-color
   ]
+end
+to set-color
+    if fitness >= 0.9 [set color 19.9]
+    if fitness < 0.9 [set color 19.9 - 0.5]
+    if fitness < 0.85 [set color 19.9 - 1.0]
+    if fitness < 0.8 [set color 19.9 - 1.5]
+    if fitness < 0.75 [set color 19.9 - 2.5]
+    if fitness < 0.7 [set color 19.9 - 2.5]
+    if fitness < 0.65 [set color 19.9 - 3.0]
+    if fitness < 0.6 [set color 19.9 - 3.5]
+    if fitness < 0.55 [set color 19.9 - 4.0]
+    if fitness < 0.5 [set color 19.9 - 4.5]
+
 end
 
 to go
-if end-ticks - start-cin = 1[
-  ask tumorcells
-[
-calculate-missegregations
-  ]]
+  calculate-chromosome-scores
+  calculate-fitness
+  ;check-death
 if (ticks < 1) [ reset-timer ]
-tick
-if (ticks >= start-cin)
-  [
-    ask tumorcells
-    [
-      set CIN-level initial-CIN
-  ]]
 if ticks = end-ticks or count tumorcells >= end-population
   [
     show (word "Execution  finished  in " timer " seconds ")
     output-chromosome-state
     stop
   ]
+ tick
+
+  assign-mitosis-probability
   check-death
-  calculate-chromosome-scores
-  calculate-fitness
-  assign-resources
   assign-cin
   reset-division-state
 
   ask tumorcells[
-    if resources >= 100
+    if (100 * fitness) >= MitosisProbability
     [
       mitosis1
       mitosis2
   ]]
 
+end
+
+to assign-mitosis-probability
+  ask tumorcells [
+    set MitosisProbability random 100
+  ]
 end
 
 to calculate-missegregations
@@ -619,32 +622,6 @@ to reset-division-state
   set pmiseg22 0
   set pmisegX 0
   ]
-end
-
-to assign-resources
-  ask tumorcells
-  [ifelse fitness >= 1.0
-    [set resources resources + 50]
-    [ifelse fitness >= 0.9
-      [set resources resources + 45]
-      [ifelse fitness >= 0.8
-        [set resources resources + 40]
-        [ifelse fitness >= 0.7
-          [set resources resources + 35]
-          [ifelse fitness >= 0.6
-            [set resources resources + 30]
-            [ifelse fitness >= 0.5
-              [set resources resources + 25]
-              [ifelse fitness >= 0.4
-                [set resources resources + 20]
-                [ifelse fitness >= 0.3
-                  [set resources resources + 15]
-                  [ifelse fitness >= 0.2
-                    [set resources resources + 10]
-                    [ifelse fitness >= 0.1
-                      [set resources resources + 5]
-                      [if fitness < 0 [die]
-  ]]]]]]]]]]]
 end
 
 to assign-cin
@@ -1327,8 +1304,6 @@ to assign-cin
 end
 
 to mitosis1
-    set resources resources / 2
-
    if MP1 < 10 and MChrom1 > 0
    [
     ifelse MGL1 = 0
@@ -1774,10 +1749,8 @@ end
 
 to mitosis2
     hatch 1
-    [
-      set resources 50
-
-    if MP1 < 10 and mmiseg1 = 1
+   [
+     if MP1 < 10 and mmiseg1 = 1
    [
     ifelse MGL1 = 0
     [set MChrom1 Mchrom1 + 2
@@ -2194,7 +2167,6 @@ to mitosis2
      set karyotype karyotype - 2
   ]]
 
-
     set Chrom1 (MChrom1 + PChrom1)
     set Chrom2 (MChrom2 + PChrom2)
     set Chrom3 (MChrom3 + PChrom3)
@@ -2219,24 +2191,17 @@ to mitosis2
     set Chrom22 (MChrom22 + PChrom22)
     set ChromX (MChromX + PChromX)
 
-    if fitness >= 0.8 [set color 19.9]
-    if fitness < 0.8 [set color 19.9 - 0.5]
-    if fitness < 0.75 [set color 19.9 - 1.0]
-    if fitness < 0.7 [set color 19.9 - 1.5]
-    if fitness < 0.65 [set color 19.9 - 2.5]
-    if fitness < 0.6 [set color 19.9 - 2.5]
-    if fitness < 0.55 [set color 19.9 - 3.0]
-    if fitness < 0.5 [set color 19.9 - 3.5]
-    if fitness < 0.45 [set color 19.9 - 4.0]
-    if fitness < 0.4 [set color 19.9 - 4.5]
+    set-color
+    set-position
+    ]
+end
 
+to set-position
       rt random 90
       lt random 90
       tilt-down random 90
       tilt-up random 90
       fd 1.00
-    ]
-
 end
 
 to calculate-chromosome-scores
@@ -2301,7 +2266,6 @@ end
 
 to check-death
   ask tumorcells [
-    if resources <= 0 [die]
     if fitness <= 0 [die]
 
     if Chrom1 <= 0  [die]
@@ -2353,7 +2317,7 @@ to check-death
     if ChromX >= 13  [die]
   ]
   ask n-of (count tumorcells / 2) tumorcells [
-    if count tumorcells >= 1000 [die]
+    if count tumorcells >= 2000 [die]
   ]
 end
 
@@ -2421,9 +2385,9 @@ ticks
 30.0
 
 BUTTON
-22
+20
 10
-88
+86
 43
 NIL
 setup\n
@@ -2438,9 +2402,9 @@ NIL
 1
 
 BUTTON
-93
+85
 10
-156
+148
 43
 NIL
 go
@@ -2455,10 +2419,10 @@ NIL
 0
 
 SLIDER
-21
-80
-193
-113
+20
+110
+192
+143
 initial-CIN
 initial-CIN
 0
@@ -2469,25 +2433,10 @@ initial-CIN
 NIL
 HORIZONTAL
 
-SLIDER
-21
-45
-193
-78
-initial-number
-initial-number
-1
-1
-1.0
-1
-1
-NIL
-HORIZONTAL
-
 MONITOR
-227
+210
 10
-305
+295
 55
 Cell Count
 count turtles
@@ -2495,22 +2444,11 @@ count turtles
 1
 11
 
-SWITCH
-20
-220
-123
-253
-SAC
-SAC
-1
-1
--1000
-
 BUTTON
-160
-11
-223
-44
+145
+10
+208
+43
 step
 go
 NIL
@@ -2523,22 +2461,11 @@ NIL
 NIL
 1
 
-SWITCH
-20
-184
-184
-217
-show-resources?
-show-resources?
-1
-1
--1000
-
 PLOT
-10
-680
-635
-1015
+445
+430
+700
+580
 Average Chromosome Number
 Time
 Average Chromosome #
@@ -2558,20 +2485,20 @@ PENS
 "pen-5" 1.0 0 -1184463 true "" "plot mean [ chrom9 ] of tumorcells"
 
 TEXTBOX
-375
-15
-505
-205
-CIN RATES:  \nProbability of missegregation for each individual chromosome\n0 = no CIN\n1 = 1/368\n2 = 1/184\n3 = 1/92\n4 = 1/46\n5 = 1/23\n6 = 2/23\n7 = 4/23\n8 = 8/23
+705
+10
+835
+216
+CIN RATES:  \nProbability of missegregation for each individual chromosome\n0 = no CIN\n1 = 1/368\n2 = 1/184\n3 = 1/92\n4 = 1/46\n5 = 1/23\n6 = 2/23\n7 = 4/23\n8 = 8/23\n9 = 16/23\n10 = 23/46\n11 = 1
 10
 0.0
 1
 
 PLOT
-232
-259
-456
-431
+230
+260
+465
+432
 Average Ploidy
 Time
 # Chromosomes
@@ -2606,24 +2533,24 @@ PENS
 "pen-1" 1.0 0 -8053223 true "" "plot count turtles with [karyotype / 23 != initial-ploidy]"
 
 SLIDER
-20
-150
-194
-183
+19
+180
+193
+213
 end-population
 end-population
 1000
 200000
-400000.0
+200000.0
 1000
 1
 NIL
 HORIZONTAL
 
 PLOT
-455
+465
 260
-690
+700
 430
 Average Fitness
 NIL
@@ -2631,7 +2558,7 @@ NIL
 0.0
 10.0
 0.0
-2.0
+1.1
 true
 false
 "" ""
@@ -2640,188 +2567,35 @@ PENS
 "pen-1" 1.0 0 -7500403 true "" ""
 
 SLIDER
-193
-81
-365
-114
+19
+215
+194
+248
 selective-pressure
 selective-pressure
 0
-100
+10
 100.0
 1
 1
 NIL
 HORIZONTAL
 
-BUTTON
-190
-210
-340
-243
-Kill Aneuploid Cells
-if Chrom1 != initial-ploidy [die]\nif Chrom2 != initial-ploidy [die]\nif Chrom3 != initial-ploidy [die]\nif Chrom4 != initial-ploidy [die]\nif Chrom5 != initial-ploidy [die]\nif Chrom6 != initial-ploidy [die]\nif Chrom7 != initial-ploidy [die]\nif Chrom8 != initial-ploidy [die]\nif Chrom9 != initial-ploidy [die]\nif Chrom10 != initial-ploidy [die]\nif Chrom11 != initial-ploidy [die]\nif Chrom12 != initial-ploidy [die]\nif Chrom13 != initial-ploidy [die]\nif Chrom14 != initial-ploidy [die]\nif Chrom15 != initial-ploidy [die]\nif Chrom16 != initial-ploidy [die]\nif Chrom17 != initial-ploidy [die]\nif Chrom18 != initial-ploidy [die]\nif Chrom19 != initial-ploidy [die]\nif Chrom20 != initial-ploidy [die]\nif Chrom21 != initial-ploidy [die]\nif Chrom22 != initial-ploidy [die]\nif ChromX != initial-ploidy [die]
-NIL
-1
-T
-TURTLE
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-198
-177
-331
-210
-Kill Euploid Cells
-if Chrom1 = initial-ploidy and \nChrom2 = initial-ploidy and\nChrom3 = initial-ploidy and\nChrom4 = initial-ploidy and\nChrom5 = initial-ploidy and\nChrom6 = initial-ploidy and\nChrom7 = initial-ploidy and\nChrom8 = initial-ploidy and\nChrom9 = initial-ploidy and\nChrom10 = initial-ploidy and\nChrom11 = initial-ploidy and\nChrom12 = initial-ploidy and\nChrom13 = initial-ploidy and\nChrom14 = initial-ploidy and\nChrom15 = initial-ploidy and\nChrom16 = initial-ploidy and\nChrom17 = initial-ploidy and\nChrom18 = initial-ploidy and\nChrom19 = initial-ploidy and\nChrom20 = initial-ploidy and\nChrom21 = initial-ploidy and\nChrom22 = initial-ploidy and\nChromX = initial-ploidy [die]
-NIL
-1
-T
-TURTLE
-NIL
-NIL
-NIL
-NIL
-1
-
 INPUTBOX
-455
-75
-684
-135
+195
+120
+365
+180
 end-ticks
-16.0
+1000.0
 1
 0
 Number
 
-BUTTON
-250
-440
-382
-473
-Kill fitness < 0.5
-if fitness < 0.5 [die]
-T
-1
-T
-TURTLE
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-250
-480
-382
-513
-Kill fitness < 0.7
-if fitness < 0.7 [die]
-NIL
-1
-T
-TURTLE
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-250
-560
-382
-593
-Kill fitness < 0.9
-if fitness < 0.9 [die]
-NIL
-1
-T
-TURTLE
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-250
-520
-382
-553
-Kill fitness < 0.8
-if fitness < 0.9 [die]
-NIL
-1
-T
-TURTLE
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-250
-600
-387
-633
-Kill fitness < 0.75
-if fitness < 0.75 [die]
-NIL
-1
-T
-TURTLE
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-250
-640
-390
-673
-Kill fitness < 0.95
-if fitness < 0.95 [die]
-NIL
-1
-T
-TURTLE
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-400
-640
-547
-673
-Kill fitness < 1 
-if fitness < 1 [die]\n
-NIL
-1
-T
-TURTLE
-NIL
-NIL
-NIL
-NIL
-1
-
 PLOT
-455
-140
-690
+380
+110
+700
 260
 Average Karyotype
 NIL
@@ -2837,10 +2611,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot mean [ karyotype ] of tumorcells"
 
 SLIDER
-20
-115
-192
-148
+19
+145
+191
+178
 initial-ploidy
 initial-ploidy
 0
@@ -2851,47 +2625,44 @@ initial-ploidy
 NIL
 HORIZONTAL
 
-PLOT
-0
-430
-230
-585
-plot 1
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot count turtles with [chrom1 < 0]"
-"pen-1" 1.0 0 -12087248 true "" "plot count turtles with [chrom2 < 0]"
-"pen-2" 1.0 0 -7500403 true "" "plot count turtles with [chrom3 < 0]"
-"pen-3" 1.0 0 -2674135 true "" "plot count turtles with [chrom4 < 0]"
-"pen-4" 1.0 0 -955883 true "" "plot count turtles with [chrom5 < 0]"
-"pen-5" 1.0 0 -6459832 true "" "plot count turtles with [chrom6 < 0]"
-
 INPUTBOX
 195
-115
+180
 365
-175
-start-cin
-15.0
+240
+outputcount
+100.0
 1
 0
 Number
 
-INPUTBOX
-350
-190
+PLOT
+0
+430
 445
-250
-outputcount
-38.0
+580
+Chromosome 1 Variance
+Ticks
+Variance
+0.0
+10.0
+0.0
+5.0
+true
+true
+"" ""
+PENS
+"Chr 1" 1.0 0 -16777216 true "" "plot variance [Chrom1] of tumorcells"
+"Chr 18" 1.0 0 -5298144 true "" "plot variance [Chrom18] of tumorcells"
+"Chr 6" 1.0 0 -14070903 true "" "plot variance [Chrom6] of tumorcells"
+
+INPUTBOX
+20
+50
+190
+110
+initial-number
+500.0
 1
 0
 Number
@@ -3640,7 +3411,7 @@ need-to-manually-make-preview-for-this-model
       <value value="13"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="CINModelSteadyState" repetitions="10" runMetricsEveryStep="false">
+  <experiment name="VarianceOverTIme" repetitions="10" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
     <metric>count tumorcells</metric>
@@ -3670,13 +3441,7 @@ need-to-manually-make-preview-for-this-model
     <metric>Chrom22-final</metric>
     <metric>ChromX-final</metric>
     <enumeratedValueSet variable="initial-number">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="SAC">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="show-resources?">
-      <value value="false"/>
+      <value value="500"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="initial-CIN">
       <value value="0"/>
@@ -3701,24 +3466,28 @@ need-to-manually-make-preview-for-this-model
       <value value="100"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="end-ticks">
-      <value value="16"/>
+      <value value="1"/>
+      <value value="2"/>
+      <value value="5"/>
+      <value value="10"/>
+      <value value="100"/>
+      <value value="500"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="end-population">
       <value value="400000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="start-cin">
-      <value value="15"/>
+      <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="outputcount">
-      <value value="38"/>
+      <value value="100"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="CINModelSteadyStateTest" repetitions="10" runMetricsEveryStep="false">
+  <experiment name="CINDoseResponse" repetitions="5" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
     <metric>count tumorcells</metric>
     <metric>CIN-rate</metric>
-    <metric>total-misseg</metric>
     <metric>count turtles with [karyotype / 23 != initial-ploidy]</metric>
     <metric>Chrom1-final</metric>
     <metric>Chrom2-final</metric>
@@ -3744,13 +3513,7 @@ need-to-manually-make-preview-for-this-model
     <metric>Chrom22-final</metric>
     <metric>ChromX-final</metric>
     <enumeratedValueSet variable="initial-number">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="SAC">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="show-resources?">
-      <value value="false"/>
+      <value value="1000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="initial-CIN">
       <value value="0"/>
@@ -3771,24 +3534,31 @@ need-to-manually-make-preview-for-this-model
     </enumeratedValueSet>
     <enumeratedValueSet variable="selective-pressure">
       <value value="0"/>
+      <value value="1"/>
+      <value value="5"/>
+      <value value="10"/>
+      <value value="50"/>
+      <value value="100"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="end-ticks">
-      <value value="16"/>
+      <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="end-population">
       <value value="400000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="start-cin">
-      <value value="15"/>
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="outputcount">
+      <value value="100"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="MissegBias5000Gen" repetitions="1" runMetricsEveryStep="false">
+  <experiment name="CINModelProbability" repetitions="5" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
     <metric>count tumorcells</metric>
-    <metric>CIN-rate</metric>
-    <metric>total-misseg</metric>
     <metric>count turtles with [karyotype / 23 != initial-ploidy]</metric>
+    <metric>CIN-rate</metric>
     <metric>Chrom1-final</metric>
     <metric>Chrom2-final</metric>
     <metric>Chrom3-final</metric>
@@ -3813,34 +3583,43 @@ need-to-manually-make-preview-for-this-model
     <metric>Chrom22-final</metric>
     <metric>ChromX-final</metric>
     <enumeratedValueSet variable="initial-number">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="SAC">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="show-resources?">
-      <value value="false"/>
+      <value value="500"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="initial-CIN">
       <value value="0"/>
       <value value="1"/>
+      <value value="2"/>
+      <value value="3"/>
+      <value value="4"/>
+      <value value="5"/>
+      <value value="6"/>
+      <value value="7"/>
+      <value value="8"/>
+      <value value="9"/>
+      <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="initial-ploidy">
       <value value="2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="selective-pressure">
-      <value value="2"/>
+      <value value="0"/>
+      <value value="1"/>
+      <value value="10"/>
+      <value value="100"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="end-ticks">
-      <value value="515"/>
-      <value value="1015"/>
-      <value value="5015"/>
+      <value value="1"/>
+      <value value="2"/>
+      <value value="5"/>
+      <value value="10"/>
+      <value value="100"/>
+      <value value="1000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="end-population">
-      <value value="400000"/>
+      <value value="200000"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="start-cin">
-      <value value="15"/>
+    <enumeratedValueSet variable="outputcount">
+      <value value="100"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
