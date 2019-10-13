@@ -21,5 +21,6 @@ These documents will serve as version control for the agent-based stochastic mod
 **After initialization, all agents (or "tumor cells") go through the following processes at each time step**
 *Note: these are general steps*
 #### Initialization
-
+![Initialization](/Images/InitializationProcedure.png)
 #### At each time step
+![Iteration](/Images/IterationProcedure.png)
