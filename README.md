@@ -7,4 +7,4 @@ Population-level karyptypic variation is dependent on 4 factors:<br>
 
 These documents will serve as version control for the stochastic models of these factors with selection based on normalized gene numbers from each chromosome. All models were developed in NetLogo. 
 
-CINModelMaster.nlogo3d is the fundamental framework on which all other files in the ModelingScripts folder are built on. 
+*CINModelMaster.nlogo3d* is the fundamental framework on which all other files in the ModelingScripts folder are built on. 
