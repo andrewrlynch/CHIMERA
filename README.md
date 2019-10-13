@@ -5,7 +5,7 @@ Population-level karyptypic variation is dependent on 4 factors:<br>
 3. The number of cellular divisions that occur
 4. The periodicity of chromosomal instability (i.e. how *often* it occurs)
 
-These documents will serve as version control for the stochastic models of these factors with selection based on normalized gene numbers from each chromosome. All models were developed in NetLogo. 
+These documents will serve as version control for the agent-based stochastic models of these factors with selection based on normalized gene numbers from each chromosome. All models were developed in NetLogo. 
 
 **CINModelMaster.nlogo3d** is the fundamental framework on which all other files in the ModelingScripts folder are built on.
 
@@ -18,3 +18,8 @@ These documents will serve as version control for the stochastic models of these
 4. Cells whose fitness falls below 0.5 die. 
 
 ### General framework
+**After initialization, all agents (or "tumor cells") go through the following processes at each time step**
+*Note: these are general steps*
+#### Initialization
+
+#### At each time step
