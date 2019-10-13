@@ -23,4 +23,7 @@ These documents will serve as version control for the agent-based stochastic mod
 #### Initialization
 ![Initialization](/Images/InitializationProcedure.png)
 #### At each time step
+**Circle** = system command<br>
+**Rectangle** = agent command<br>
+**Diamond** = negative agent command<br><br>
 ![Iteration](/Images/IterationProcedure.png)
