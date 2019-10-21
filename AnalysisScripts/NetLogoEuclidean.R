@@ -5,23 +5,6 @@ library("ggplot2")
 library("stringr")
 library("gridExtra")
 
-#Prior to running this - subset by # of iterations/generations
-#MultipleRuns <- Division1000
-#MultipleRuns <- arrange(MultipleRuns, X.run.number.)
-#MultipleRuns$X.run.number. <- seq(1:5)
-
-#Separating individual runs to be processed separately.
-#MultipleRuns1 <- subset(MultipleRuns, X.run.number. == 1)
-#MultipleRuns2 <- subset(MultipleRuns, X.run.number. == 2)
-#MultipleRuns3 <- subset(MultipleRuns, X.run.number. == 3)
-#MultipleRuns4 <- subset(MultipleRuns, X.run.number. == 4)
-#MultipleRuns5 <- subset(MultipleRuns, X.run.number. == 5)
-#MultipleRuns6 <- subset(MultipleRuns, X.run.number. == 6)
-#MultipleRuns7 <- subset(MultipleRuns, X.run.number. == 7)
-#MultipleRuns8 <- subset(MultipleRuns, X.run.number. == 8)
-#MultipleRuns9 <- subset(MultipleRuns, X.run.number. == 9)
-#MultipleRuns10 <- subset(MultipleRuns, X.run.number. == 10)
-
 #Insert datafile here:
 mydata <- df
 mydata$start.cin <- NULL
@@ -349,14 +332,15 @@ EuclideanMeasurement <- function(x) {
 run <- c(1:length(unique(recast$X.run.number.)))
 test <- as.data.frame(run)
 test$euc <- apply(test, 1, EuclideanMeasurement)
-View(test)
 euc <- rep(test$euc, nrow(recast)/length(unique(recast$X.run.number.)))
 testdf <- cbind(recast, euc)
 testdf1 <- distinct(testdf[,c(1,4,8,11,12,36)])
+testdf1$clusters <- clusters
 testdf1 <- arrange(testdf1, CIN.rate, periodicity, selective.pressure)
 testdf1$rep <- rep(seq(1:5), 264)
 testdf1sb <- subset(testdf1, selective.pressure != 0)
 testdf1sb$CIN.rate <- round(testdf1sb$CIN.rate, 4)
+
 library(ggplot2)
 library(ggpubr)
 
@@ -374,4 +358,85 @@ plot <- ggplot(testdf1sb, aes(x=log10(selective.pressure), y = euc, fill = as.fa
   guides(fill=guide_legend(title="log10(Selection)")) + 
   xlab("log10(Selection)") + 
   ylab("Mean Euclidean Distance")
-  
+
+library(dendextend)
+library(circlize)
+library(colorspace)
+library(vegan)
+library(reshape2)
+###Enter run number 
+clusters <- c()
+for (nx in distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,c(1,4,8,11,12,36)])), ]$X.run.number.) {
+  print(nx)
+###Cluster
+testset <- subset(recast[complete.cases(recast), ],X.run.number. == nx)[13:35]
+hc <- hclust(dist(as.matrix(testset)), method = "complete")
+
+###Optimal clustering
+df <- melt(as.matrix(dist(as.matrix(testset)), varnames = c("row", "col")))
+  if (any(is.na(scale(df)[,3])) == TRUE){
+    clusters[nx] <- NA
+    next
+  }
+fit <- cascadeKM(scale(df, center = TRUE,  scale = TRUE), 1, 10, iter = 10)
+#dev.off()
+#plot(fit, sortg = TRUE, grpmts.plot = TRUE)
+calinskiclusters <- as.numeric(which.max(fit$results[2,]))
+clusters[nx] <- calinski.best
+
+#Calculate mean euclidean distance within cluster
+testset$ClusterID <- cutree(hc, calinskiclusters)
+clustermeanvar <- c()
+for (i in seq(calinski.best)) {
+  clustermeanvar[i] <- mean(dist(as.matrix(subset(testset, ClusterID == i)[1:23])))
+  intraclustermeaneuc <- mean(clustermeanvar, na.rm = TRUE)
+}
+
+#Calculate mean euclidean distance between clusters
+
+#Calculate some ratio between number of clusters, distance within and distance between
+
+
+}
+
+###Dendextend
+dend <- as.dendrogram(hc)
+num_clusters <- calinskiclusters
+dend <- dend %>% 
+  color_branches(k=num_clusters, col=rainbow_hcl) %>%
+  set("branches_lwd", 4) %>%
+  set("labels_cex", 0.8) %>%
+  set("labels", c(1:100))
+
+par(mar = rep(0, 4))
+circlize_dendrogram(dend, dend_track_height = 0.8)
+
+#Heatmap
+dev.off()
+heatmap <- heatmap.2(as.matrix(subset(recast,X.run.number. == nx)[13:35]),   # Tidy, normalised data
+                     Rowv=TRUE,
+                     Colv=FALSE,
+                     density.info="histogram",
+                     dendrogram = "row",
+                     trace="none")               # Turn of trace lines from heat map
+
+
+###Comparitive cluster number analysis
+
+testdf1sb$clusters <- clusters[!is.na(clusters)]
+testdf1sb$clusters <- clusters[!is.na(testdf1sb)]
+
+plot <- ggplot(testdf1sb, aes(x=log10(selective.pressure), y = clusters, fill = as.factor(selective.pressure))) + 
+  geom_line(group = testdf1sb$rep, lty = 3) +
+  geom_point(size = 3, shape = 21) + 
+  facet_grid(periodicity ~ CIN.rate) + 
+  theme_bw() + 
+  theme(axis.text = element_text(angle = 90, color = "black")) +
+  theme(strip.text.x = element_text(color="black",
+                                    face="bold"),
+        strip.text.y = element_text(color="black",
+                                    face="bold")) + 
+  theme(legend.title = element_text(face = "bold"), legend.position = "none") + 
+  guides(fill=guide_legend(title="log10(Selection)")) + 
+  xlab("log10(Selection)") + 
+  ylab("Clusters")
