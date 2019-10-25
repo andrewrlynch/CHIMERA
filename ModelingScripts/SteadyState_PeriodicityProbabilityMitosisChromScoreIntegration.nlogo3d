@@ -496,28 +496,28 @@ to setup-progenitor
 
     set w 0.01
 
-    set CS1 0.144
-    set CS2 -0.638
-    set CS3 -0.598
-    set CS4 -0.106
-    set CS5 0.785
-    set CS6 0.664
-    set CS7 -3.040
-    set CS8 -1.651
-    set CS9 -0.766
-    set CS10 1.234
-    set CS11 -0.210
-    set CS12 -1.720
-    set CS13 1.208
-    set CS14 0.713
-    set CS15 0.752
-    set CS16 1.278
-    set CS17 0.785
-    set CS18 1.428
-    set CS19 -0.809
-    set CS20 -1.781
-    set CS21 -1.569
-    set CS22 1.576
+    set CS1 0.0522
+    set CS2 0.1322
+    set CS3 0.1644
+    set CS4 0.0941
+    set CS5 0.0868
+    set CS6 0.0554
+    set CS7 0.2935
+    set CS8 0.1745
+    set CS9 0.1260
+    set CS10 0.0032
+    set CS11 0.1046
+    set CS12 0.2256
+    set CS13 -0.0382
+    set CS14 0.0951
+    set CS15 0.0764
+    set CS16 0.0740
+    set CS17 0.1057
+    set CS18 -0.0688
+    set CS19 0.0980
+    set CS20 0.1777
+    set CS21 -0.0124
+    set CS22 -0.0200
   ]
 
 end
@@ -2330,28 +2330,28 @@ to calculate-chromosome-scores
 
   set chromavg karyotype / 23
 
-  set fitd1 (Fc1 - (Fc1 * abs(Chrom1 - chromavg)) / chromavg) - (Chrom1 * (w * CS1))
-  set fitd2 (Fc2 - (Fc2 * abs(Chrom2 - chromavg)) / chromavg) - (Chrom2 * (w * CS2))
-  set fitd3 (Fc3 - (Fc3 * abs(Chrom3 - chromavg)) / chromavg) - (Chrom3 * (w * CS3))
-  set fitd4 (Fc4 - (Fc4 * abs(Chrom4 - chromavg)) / chromavg) - (Chrom4 * (w * CS4))
-  set fitd5 (Fc5 - (Fc5 * abs(Chrom5 - chromavg)) / chromavg) - (Chrom5 * (w * CS5))
-  set fitd6 (Fc6 - (Fc6 * abs(Chrom6 - chromavg)) / chromavg) - (Chrom6 * (w * CS6))
-  set fitd7 (Fc7 - (Fc7 * abs(Chrom7 - chromavg)) / chromavg) - (Chrom7 * (w * CS7))
-  set fitd8 (Fc8 - (Fc8 * abs(Chrom8 - chromavg)) / chromavg) - (Chrom8 * (w * CS8))
-  set fitd9 (Fc9 - (Fc9 * abs(Chrom9 - chromavg)) / chromavg) - (Chrom9 * (w * CS9))
-  set fitd10 (Fc10 - (Fc10 * abs(Chrom10 - chromavg)) / chromavg) - (Chrom10 * (w * CS10))
-  set fitd11 (Fc11 - (Fc11 * abs(Chrom11 - chromavg)) / chromavg) - (Chrom11 * (w * CS11))
-  set fitd12 (Fc12 - (Fc12 * abs(Chrom12 - chromavg)) / chromavg) - (Chrom12 * (w * CS12))
-  set fitd13 (Fc13 - (Fc13 * abs(Chrom13 - chromavg)) / chromavg) - (Chrom13 * (w * CS13))
-  set fitd14 (Fc14 - (Fc14 * abs(Chrom14 - chromavg)) / chromavg) - (Chrom14 * (w * CS14))
-  set fitd15 (Fc15 - (Fc15 * abs(Chrom15 - chromavg)) / chromavg) - (Chrom15 * (w * CS15))
-  set fitd16 (Fc16 - (Fc16 * abs(Chrom16 - chromavg)) / chromavg) - (Chrom16 * (w * CS16))
-  set fitd17 (Fc17 - (Fc17 * abs(Chrom17 - chromavg)) / chromavg) - (Chrom17 * (w * CS17))
-  set fitd18 (Fc18 - (Fc18 * abs(Chrom18 - chromavg)) / chromavg) - (Chrom18 * (w * CS18))
-  set fitd19 (Fc19 - (Fc19 * abs(Chrom19 - chromavg)) / chromavg) - (Chrom19 * (w * CS19))
-  set fitd20 (Fc20 - (Fc20 * abs(Chrom20 - chromavg)) / chromavg) - (Chrom20 * (w * CS20))
-  set fitd21 (Fc21 - (Fc21 * abs(Chrom21 - chromavg)) / chromavg) - (Chrom21 * (w * CS21))
-  set fitd22 (Fc22 - (Fc22 * abs(Chrom22 - chromavg)) / chromavg) - (Chrom22 * (w * CS22))
+  set fitd1 (Fc1 - (Fc1 * abs(Chrom1 - chromavg)) / chromavg)
+  set fitd2 (Fc2 - (Fc2 * abs(Chrom2 - chromavg)) / chromavg)
+  set fitd3 (Fc3 - (Fc3 * abs(Chrom3 - chromavg)) / chromavg)
+  set fitd4 (Fc4 - (Fc4 * abs(Chrom4 - chromavg)) / chromavg)
+  set fitd5 (Fc5 - (Fc5 * abs(Chrom5 - chromavg)) / chromavg)
+  set fitd6 (Fc6 - (Fc6 * abs(Chrom6 - chromavg)) / chromavg)
+  set fitd7 (Fc7 - (Fc7 * abs(Chrom7 - chromavg)) / chromavg)
+  set fitd8 (Fc8 - (Fc8 * abs(Chrom8 - chromavg)) / chromavg)
+  set fitd9 (Fc9 - (Fc9 * abs(Chrom9 - chromavg)) / chromavg)
+  set fitd10 (Fc10 - (Fc10 * abs(Chrom10 - chromavg)) / chromavg)
+  set fitd11 (Fc11 - (Fc11 * abs(Chrom11 - chromavg)) / chromavg)
+  set fitd12 (Fc12 - (Fc12 * abs(Chrom12 - chromavg)) / chromavg)
+  set fitd13 (Fc13 - (Fc13 * abs(Chrom13 - chromavg)) / chromavg)
+  set fitd14 (Fc14 - (Fc14 * abs(Chrom14 - chromavg)) / chromavg)
+  set fitd15 (Fc15 - (Fc15 * abs(Chrom15 - chromavg)) / chromavg)
+  set fitd16 (Fc16 - (Fc16 * abs(Chrom16 - chromavg)) / chromavg)
+  set fitd17 (Fc17 - (Fc17 * abs(Chrom17 - chromavg)) / chromavg)
+  set fitd18 (Fc18 - (Fc18 * abs(Chrom18 - chromavg)) / chromavg)
+  set fitd19 (Fc19 - (Fc19 * abs(Chrom19 - chromavg)) / chromavg)
+  set fitd20 (Fc20 - (Fc20 * abs(Chrom20 - chromavg)) / chromavg)
+  set fitd21 (Fc21 - (Fc21 * abs(Chrom21 - chromavg)) / chromavg)
+  set fitd22 (Fc22 - (Fc22 * abs(Chrom22 - chromavg)) / chromavg)
   set fitdx (Fcx - (Fcx * abs(ChromX - chromavg)) / chromavg)
   ]
 
@@ -2359,30 +2359,51 @@ end
 
 to calculate-fitness ;----------------------------------------fitness values
   ask tumorcells [
-    set fitness (fitd1 +
-    fitd2 +
-    fitd3 +
-    fitd4 +
-    fitd5 +
-    fitd6 +
-    fitd7 +
-    fitd8 +
-    fitd9 +
-    fitd10 +
-    fitd11 +
-    fitd12 +
-    fitd13 +
-    fitd14 +
-    fitd15 +
-    fitd16 +
-    fitd17 +
-    fitd18 +
-    fitd19 +
-    fitd20 +
-    fitd21 +
-    fitd22 +
-    fitdx) ^ selective-pressure
-
+    set fitness (precision ((((
+      fitd1 +
+      fitd2 +
+      fitd3 +
+      fitd4 +
+      fitd5 +
+      fitd6 +
+      fitd7 +
+      fitd8 +
+      fitd9 +
+      fitd10 +
+      fitd11 +
+      fitd12 +
+      fitd13 +
+      fitd14 +
+      fitd15 +
+      fitd16 +
+      fitd17 +
+      fitd18 +
+      fitd19 +
+      fitd20 +
+      fitd21 +
+      fitd22 +
+      fitdx) + (((Chrom1 * CS1) / chromavg) +
+      ((Chrom2 * CS2) / chromavg) +
+      ((Chrom3 * CS3) / chromavg) +
+      ((Chrom4 * CS4) / chromavg) +
+      ((Chrom5 * CS5) / chromavg) +
+      ((Chrom6 * CS6) / chromavg) +
+      ((Chrom7 * CS7) / chromavg) +
+      ((Chrom8 * CS8) / chromavg) +
+      ((Chrom9 * CS9) / chromavg) +
+      ((Chrom10 * CS10) / chromavg) +
+      ((Chrom11 * CS11) / chromavg) +
+      ((Chrom12 * CS12) / chromavg) +
+      ((Chrom13 * CS13) / chromavg) +
+      ((Chrom14 * CS14) / chromavg) +
+      ((Chrom15 * CS15) / chromavg) +
+      ((Chrom16 * CS16) / chromavg) +
+      ((Chrom17 * CS17) / chromavg) +
+      ((Chrom18 * CS18) / chromavg) +
+      ((Chrom19 * CS19) / chromavg) +
+      ((Chrom20 * CS20) / chromavg) +
+      ((Chrom21 * CS21) / chromavg) +
+      ((Chrom22 * CS22) / chromavg)) / 2)) / 2) 3) ^ selective-pressure
   ]
 end
 
@@ -2576,7 +2597,7 @@ initial-CIN
 initial-CIN
 0
 11
-3.0
+10.0
 1
 1
 NIL
@@ -2724,7 +2745,7 @@ selective-pressure
 selective-pressure
 0
 10
-1.0
+50.0
 1
 1
 NIL
@@ -2736,7 +2757,7 @@ INPUTBOX
 365
 190
 end-ticks
-500.0
+80.0
 1
 0
 Number
@@ -2791,7 +2812,7 @@ INPUTBOX
 190
 110
 initial-number
-1.0
+500.0
 1
 0
 Number
@@ -2802,7 +2823,7 @@ INPUTBOX
 165
 310
 cin-period-start
-0.0
+64.0
 1
 0
 Number
@@ -2813,7 +2834,7 @@ INPUTBOX
 312
 310
 cin-period-end
-500.0
+80.0
 1
 0
 Number
@@ -2826,7 +2847,7 @@ CHOOSER
 periodicity
 periodicity
 "constant" "early" "middle" "late"
-0
+3
 
 PLOT
 340
@@ -2856,7 +2877,7 @@ INPUTBOX
 517
 95
 mitosis-probability
-300.0
+100.0
 1
 0
 Number
@@ -3203,7 +3224,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 3D 6.0.4
+NetLogo 3D 6.1.1
 @#$#@#$#@
 need-to-manually-make-preview-for-this-model
 @#$#@#$#@
@@ -3811,7 +3832,7 @@ need-to-manually-make-preview-for-this-model
       <value value="100"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="end-ticks">
-      <value value="40"/>
+      <value value="80"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="end-population">
       <value value="200000"/>
