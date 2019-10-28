@@ -390,11 +390,6 @@ for (nx in distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,
   next
   }
   fit <- cascadeKM(scale(df, center = TRUE, scale = TRUE), 1, 12, iter = 5)
-  #Output cluster analysis
-  pdf(sprintf("~/ClusterOutput/%s/%s_ClusterAnalysis.pdf", outputid, outputid), width = 6, height = 3) 
-  plot(fit, sortg = TRUE, grpmts.plot = TRUE)
-  dev.off
-  #
   calinskiclusters <- as.numeric(which.max(fit$results[2,]))
   clusters[nx] <- calinskiclusters
   
@@ -425,6 +420,11 @@ for (nx in distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,
     dir.create(sprintf("~/ClusterOutput/%s", outputid), showWarnings = TRUE, recursive = FALSE, mode = "0777")
   }
   
+  #Output cluster analysis
+  pdf(sprintf("~/ClusterOutput/%s/%s_ClusterAnalysis.pdf", outputid, outputid), width = 6, height = 3) 
+  plot(fit, sortg = TRUE, grpmts.plot = TRUE)
+  dev.off
+  #
   
   #RADIAL DENDROGRAM
   pdf(sprintf("~/ClusterOutput/%s/%s_FanDendro.pdf", outputid, outputid), width = 5, height = 5) 
