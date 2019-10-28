@@ -16,7 +16,7 @@ library("RColorBrewer")
 library("ape")
 library("gplots")
 library("vegan")
-
+library("viridis")
 
 #GetMode
 getmode <- function(v) {
@@ -24,9 +24,8 @@ getmode <- function(v) {
   uniqv[which.max(tabulate(match(v, uniqv)))]
 }
 
-
 #Insert datafile here:
-mydata <- `22102019ARL_ChromScores2`
+mydata <- `22102019ARL_ModelingCIN_ChromScores`
 mydata$start.cin <- NULL
 
 mydata$X.run.number. <- seq(1:length(mydata$X.run.number.))
@@ -432,7 +431,8 @@ for (nx in distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,
   dev.off() 
   
   #HEATMAPS
-    pdf(sprintf("~/ClusterOutput/%s/%s_heatmap.pdf", nx, nx), width = 3, height = 6) 
+heatmap_color <- viridis(12)
+    pdf(sprintf("~/ClusterOutput/%s/%s_heatmap.pdf", nx, nx), width = 4, height = 6) 
     
     heatmap <- heatmap.2(as.matrix(subset(recast,X.run.number. == nx)[13:35]),   # Tidy, normalised data
                          Rowv=TRUE,
@@ -442,7 +442,8 @@ for (nx in distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,
                          trace="none",
                          cexRow = 0.5,
                          cexCol = 0.5, 
-                         key = FALSE)    
+                         key = FALSE,
+                         col = heatmap_color)    
     dev.off()
 }
 
