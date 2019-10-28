@@ -380,24 +380,35 @@ for (nx in distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,
   testset <- subset(recast[complete.cases(recast), ],X.run.number. == nx)[13:35]
   hc <- hclust(dist(as.matrix(testset)), method = "ward.D")
   
+  ###CREATE OUTPUT ID
+  outputid <- sprintf("%s_%s_%s_%s", nx, round(subset(distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,c(1,4,8,11,12,36)])), ], X.run.number. == nx)$CIN.rate,4),subset(distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,c(1,4,8,11,12,36)])), ], X.run.number. == nx)$selective.pressure,subset(distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,c(1,4,8,11,12,36)])), ], X.run.number. == nx)$periodicity)
+  
   ###OPTIMAL CLUSTERING VIA CALINSKI CRITERIA
   df <- melt(as.matrix(dist(as.matrix(testset)), varnames = c("row", "col")))
-  #if (any(is.na(scale(df)[,3])) == TRUE) {
-  # clusters[nx] <- NA
-  #next
-  #}
+  if (any(is.na(scale(df)[,3])) == TRUE) {
+   clusters[nx] <- NA
+  next
+  }
+  fit <- cascadeKM(scale(df, center = TRUE, scale = TRUE), 1, 12, iter = 5)
+  #Output cluster analysis
+  pdf(sprintf("~/ClusterOutput/%s/%s_ClusterAnalysis.pdf", outputid, outputid), width = 6, height = 3) 
+  plot(fit, sortg = TRUE, grpmts.plot = TRUE)
+  dev.off
+  #
+  calinskiclusters <- as.numeric(which.max(fit$results[2,]))
+  clusters[nx] <- calinskiclusters
   
   ###CALCULATE MEAN EUCLIDEAN DISTANCE WITHIN EACH CLUSTER (4 clusters)
   testset$ClusterID <- cutree(hc, 4)
   clustermeanvar <- c()
-  for (i in seq(4)) {
+  for (i in seq(calinskiclusters)) {
     clustermeanvar[i] <- mean(dist(as.matrix(subset(testset, ClusterID == i)[1:23])), na.rm = TRUE)
   }
   intraclustermeaneuc[nx] <- mean(clustermeanvar, na.rm = TRUE)
   
   ###MEAN OF CLUSTERS AND GET DISTANCE BETWEEN CLUSTERS
-  interclusterdist <- matrix(nrow = 23, ncol = 4)
-  for (m in seq(4)) {
+  interclusterdist <- matrix(nrow = 23, ncol = calinskiclusters)
+  for (m in seq(calinskiclusters)) {
     interclusterdist[,m] <- apply(subset(testset, ClusterID == m)[1:nrow(subset(testset, ClusterID == m)),], 2, mean, na.rm = TRUE)[1:23]
   }
   meanclusterdistance[nx] <- mean(dist(t(interclusterdist)), na.rm = TRUE)
@@ -406,8 +417,6 @@ for (nx in distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,
   TemporalCINMetric[nx] <- intraclustermeaneuc[nx] / meanclusterdistance[nx]
 
   #CREATE DIRECTORY
-  outputid <- sprintf("%s_%s_%s_%s", nx, round(subset(distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,c(1,4,8,11,12,36)])), ], X.run.number. == nx)$CIN.rate,4),subset(distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,c(1,4,8,11,12,36)])), ], X.run.number. == nx)$selective.pressure,subset(distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,c(1,4,8,11,12,36)])), ], X.run.number. == nx)$periodicity)
-  
   if(dir.exists("~/ClusterOutput/") == FALSE){
     dir.create("~/ClusterOutput/", showWarnings = TRUE, recursive = FALSE, mode = "0777")
   }
@@ -420,8 +429,8 @@ for (nx in distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,
   #RADIAL DENDROGRAM
   pdf(sprintf("~/ClusterOutput/%s/%s_FanDendro.pdf", outputid, outputid), width = 5, height = 5) 
   
-  colors <- qualitative_hcl(4, "Dark3")
-  clus4 <- cutree(hc, k = 4)
+  colors <- qualitative_hcl(calinskiclusters, "Dark3")
+  clus4 <- cutree(hc, k = calinskiclusters)
   
   plot(as.phylo(hc), type = "fan", cex = 0.01,
        no.margin = FALSE)
@@ -432,8 +441,8 @@ for (nx in distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,
   #UNROOTED TREES
   pdf(sprintf("~/ClusterOutput/%s/%s_unrooted.pdf", outputid, outputid), width = 5, height = 5) 
   
-  colors <- qualitative_hcl(4, "Dark3")
-  clus4 <- cutree(hc, k = 4)
+  colors <- qualitative_hcl(calinskiclusters, "Dark3")
+  clus4 <- cutree(hc, k = calinskiclusters)
   
   plot(as.phylo(hc), type = "unrooted", cex = 0.01,
        no.margin = FALSE)
