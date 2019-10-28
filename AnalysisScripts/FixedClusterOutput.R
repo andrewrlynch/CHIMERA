@@ -344,6 +344,8 @@ separatedtest <- separate(testdf, "variable", c("chromosome","cell.id"), sep = "
 
 recast <- dcast(separatedtest, X.run.number. + initial.CIN + end.ticks + CIN.rate + cell.id + X.step. + initial.ploidy + selective.pressure + count.tumorcells + count.turtles.with..karyotype...23....initial.ploidy.  + MKV + periodicity ~ chromosome, value.var = "value")
 
+recast <- recast[,c(1:12,13,24,28:34,14:23,25:27,35)]
+
 EuclideanMeasurement <- function(x) {
   mean(dist(as.matrix(subset(recast,X.run.number. == x)[13:35])))
 }
@@ -403,11 +405,19 @@ for (nx in distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,
   TemporalCINMetric[nx] <- intraclustermeaneuc[nx] / meanclusterdistance[nx]
 
   #CREATE DIRECTORY
-  if(dir.exists(sprintf("~/ClusterOutput/%s", nx)) == FALSE){
-    dir.create(sprintf("~/ClusterOutput/%s", nx), showWarnings = TRUE, recursive = FALSE, mode = "0777")
+  outputid <- sprintf("%s_%s_%s_%s", nx, round(subset(distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,c(1,4,8,11,12,36)])), ], X.run.number. == nx)$CIN.rate,4),subset(distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,c(1,4,8,11,12,36)])), ], X.run.number. == nx)$selective.pressure,subset(distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,c(1,4,8,11,12,36)])), ], X.run.number. == nx)$periodicity)
+  
+  if(dir.exists("~/ClusterOutput/") == FALSE){
+    dir.create("~/ClusterOutput/", showWarnings = TRUE, recursive = FALSE, mode = "0777")
   }
+  
+   if(dir.exists(sprintf("~/ClusterOutput/%s", outputid)) == FALSE){
+    dir.create(sprintf("~/ClusterOutput/%s", outputid), showWarnings = TRUE, recursive = FALSE, mode = "0777")
+  }
+  
+  
   #RADIAL DENDROGRAM
-  pdf(sprintf("~/ClusterOutput/%s/%s_FanDendro.pdf", nx, nx), width = 5, height = 5) 
+  pdf(sprintf("~/ClusterOutput/%s/%s_FanDendro.pdf", outputid, outputid), width = 5, height = 5) 
   
   colors <- qualitative_hcl(4, "Dark3")
   clus4 <- cutree(hc, k = 4)
@@ -415,11 +425,11 @@ for (nx in distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,
   plot(as.phylo(hc), type = "fan", cex = 0.01,
        no.margin = FALSE)
   tiplabels(pch = 21, col = "black", cex = 1.5, bg = colors[clus4])
-  title(sprintf("%s / %s / %s",round(subset(distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,c(1,4,8,11,12,36)])), ], X.run.number. == nx)$CIN.rate,4),subset(distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,c(1,4,8,11,12,36)])), ], X.run.number. == nx)$selective.pressure,subset(distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,c(1,4,8,11,12,36)])), ], X.run.number. == nx)$periodicity))
+  title(sprintf("%s", outputid))
   dev.off() 
   
   #UNROOTED TREES
-  pdf(sprintf("~/ClusterOutput/%s/%s_unrooted.pdf", nx, nx), width = 5, height = 5) 
+  pdf(sprintf("~/ClusterOutput/%s/%s_unrooted.pdf", outputid, outputid), width = 5, height = 5) 
   
   colors <- qualitative_hcl(4, "Dark3")
   clus4 <- cutree(hc, k = 4)
@@ -427,12 +437,12 @@ for (nx in distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,
   plot(as.phylo(hc), type = "unrooted", cex = 0.01,
        no.margin = FALSE)
   tiplabels(pch = 21, col = "black", cex = 1.5, bg = colors[clus4])
-  title(sprintf("%s / %s / %s",round(subset(distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,c(1,4,8,11,12,36)])), ], X.run.number. == nx)$CIN.rate,4),subset(distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,c(1,4,8,11,12,36)])), ], X.run.number. == nx)$selective.pressure,subset(distinct(testdf[,c(1,4,8,11,12,36)])[complete.cases(distinct(testdf[,c(1,4,8,11,12,36)])), ], X.run.number. == nx)$periodicity))
+  title(sprintf("%s", outputid))
   dev.off() 
   
   #HEATMAPS
 heatmap_color <- viridis(12)
-    pdf(sprintf("~/ClusterOutput/%s/%s_heatmap.pdf", nx, nx), width = 4, height = 6) 
+    pdf(sprintf("~/ClusterOutput/%s/%s_heatmap.pdf", outputid, outputid), width = 4, height = 6) 
     
     heatmap <- heatmap.2(as.matrix(subset(recast,X.run.number. == nx)[13:35]),   # Tidy, normalised data
                          Rowv=TRUE,
