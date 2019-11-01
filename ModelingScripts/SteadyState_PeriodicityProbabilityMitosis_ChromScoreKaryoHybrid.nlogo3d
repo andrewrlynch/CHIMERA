@@ -297,7 +297,7 @@ tumorcells-own
   fitd21
   fitd22
   fitdx ;-------------------------------------end
-  CS1 ;---------------chrom scores (Davoli et al. 2013)
+  CS1 ;---------------chrom scores (Davoli et al. 13)
   CS2
   CS3
   CS4
@@ -348,44 +348,53 @@ if initial-CIN = 0
     ]
 if initial-CIN = 1
     [
-      set CIN-rate (10 / 3680)
+      set CIN-rate (10 / 7360)
     ]
 if initial-CIN = 2
     [
-      set CIN-rate (10 / 1840)
+      set CIN-rate (10 / 3680)
     ]
 if initial-CIN = 3
     [
-      set CIN-rate (10 / 920)
+      set CIN-rate (10 / 1840)
     ]
 if initial-CIN = 4
     [
-      set CIN-rate (10 / 460)
+      set CIN-rate (10 / 920)
     ]
 if initial-CIN = 5
     [
-      set CIN-rate (10 / 230)
+      set CIN-rate (10 / 460)
     ]
 if initial-CIN = 6
     [
-      set CIN-rate (10 / 120)
+      set CIN-rate (10 / 230)
     ]
 if initial-CIN = 7
     [
-      set CIN-rate (10 / 60)
+      set CIN-rate (10 / 120)
     ]
 if initial-CIN = 8
     [
-      set CIN-rate (10 / 30)
+      set CIN-rate (10 / 60)
     ]
 if initial-CIN = 9
     [
-      set CIN-rate (10 / 20)
+      set CIN-rate (10 / 30)
     ]
 if initial-CIN = 10
     [
       set CIN-rate (10 / 15)
     ]
+if initial-CIN = 11
+    [
+      set CIN-rate (10 / 15)
+    ]
+if initial-CIN = 12
+    [
+      set CIN-rate (10 / 10)
+    ]
+
 end
 
 
@@ -504,7 +513,7 @@ to setup-progenitor
     set CS6 0.0554
     set CS7 0.2935
     set CS8 0.1745
-    set CS9 0.1260
+    set CS9 0.12
     set CS10 0.0032
     set CS11 0.1046
     set CS12 0.2256
@@ -517,7 +526,7 @@ to setup-progenitor
     set CS19 0.0980
     set CS20 0.1777
     set CS21 -0.0124
-    set CS22 -0.0200
+    set CS22 -0.0300
   ]
 
 end
@@ -769,9 +778,8 @@ to reset-division-state
 end
 
 to assign-cin
-      ;-------------------------------------- Set paternal gain/loss probabilities
   ask tumorcells[
-    if CIN-level = 0 [
+    if CIN-level = 0 [ ;-------------------------------------- Set paternal gain/loss probabilities
     set PP1 999
     set PP2 999
     set PP3 999
@@ -798,6 +806,32 @@ to assign-cin
     ]
 
      if CIN-level = 1 [
+    set PP1 random 73130
+    set PP2 random 73130
+    set PP3 random 73130
+    set PP4 random 73130
+    set PP5 random 73130
+    set PP6 random 73130
+    set PP7 random 73130
+    set PP8 random 73130
+    set PP9 random 73130
+    set PP10 random 73130
+    set PP11 random 73130
+    set PP12 random 73130
+    set PP13 random 73130
+    set PP14 random 73130
+    set PP15 random 73130
+    set PP16 random 73130
+    set PP17 random 73130
+    set PP18 random 73130
+    set PP19 random 73130
+    set PP20 random 73130
+    set PP21 random 73130
+    set PP22 random 73130
+    set PPX random 73130
+    ]
+
+    if CIN-level = 2 [
     set PP1 random 3680
     set PP2 random 3680
     set PP3 random 3680
@@ -820,10 +854,10 @@ to assign-cin
     set PP20 random 3680
     set PP21 random 3680
     set PP22 random 3680
-    set PPX random 3680
+      set PPX random 3680
     ]
 
-    if CIN-level = 2 [
+    if CIN-level = 3 [
     set PP1 random 1840
     set PP2 random 1840
     set PP3 random 1840
@@ -849,111 +883,111 @@ to assign-cin
       set PPX random 1840
     ]
 
-    if CIN-level = 3 [
-    set PP1 random 920
-    set PP2 random 920
-    set PP3 random 920
-    set PP4 random 920
-    set PP5 random 920
-    set PP6 random 920
-    set PP7 random 920
-    set PP8 random 920
-    set PP9 random 920
-    set PP10 random 920
-    set PP11 random 920
-    set PP12 random 920
-    set PP13 random 920
-    set PP14 random 920
-    set PP15 random 920
-    set PP16 random 920
-    set PP17 random 920
-    set PP18 random 920
-    set PP19 random 920
-    set PP20 random 920
-    set PP21 random 920
-    set PP22 random 920
-      set PPX random 920
-    ]
-
     if CIN-level = 4 [
-    set PP1 random 460
-    set PP2 random 460
-    set PP3 random 460
-    set PP4 random 460
-    set PP5 random 460
-    set PP6 random 460
-    set PP7 random 460
-    set PP8 random 460
-    set PP9 random 460
-    set PP10 random 460
-    set PP11 random 460
-    set PP12 random 460
-    set PP13 random 460
-    set PP14 random 460
-    set PP15 random 460
-    set PP16 random 460
-    set PP17 random 460
-    set PP18 random 460
-    set PP19 random 460
-    set PP20 random 460
-    set PP21 random 460
-    set PP22 random 460
-      set PPX random 460
+    set PP1 random 930
+    set PP2 random 930
+    set PP3 random 930
+    set PP4 random 930
+    set PP5 random 930
+    set PP6 random 930
+    set PP7 random 930
+    set PP8 random 930
+    set PP9 random 930
+    set PP10 random 930
+    set PP11 random 930
+    set PP12 random 930
+    set PP13 random 930
+    set PP14 random 930
+    set PP15 random 930
+    set PP16 random 930
+    set PP17 random 930
+    set PP18 random 930
+    set PP19 random 930
+    set PP20 random 930
+    set PP21 random 930
+    set PP22 random 930
+      set PPX random 930
     ]
 
     if CIN-level = 5 [
-    set PP1 random 230
-    set PP2 random 230
-    set PP3 random 230
-    set PP4 random 230
-    set PP5 random 230
-    set PP6 random 230
-    set PP7 random 230
-    set PP8 random 230
-    set PP9 random 230
-    set PP10 random 230
-    set PP11 random 230
-    set PP12 random 230
-    set PP13 random 230
-    set PP14 random 230
-    set PP15 random 230
-    set PP16 random 230
-    set PP17 random 230
-    set PP18 random 230
-    set PP19 random 230
-    set PP20 random 230
-    set PP21 random 230
-    set PP22 random 230
-      set PPX random 230
+    set PP1 random 4130
+    set PP2 random 4130
+    set PP3 random 4130
+    set PP4 random 4130
+    set PP5 random 4130
+    set PP6 random 4130
+    set PP7 random 4130
+    set PP8 random 4130
+    set PP9 random 4130
+    set PP10 random 4130
+    set PP11 random 4130
+    set PP12 random 4130
+    set PP13 random 4130
+    set PP14 random 4130
+    set PP15 random 4130
+    set PP16 random 4130
+    set PP17 random 4130
+    set PP18 random 4130
+    set PP19 random 4130
+    set PP20 random 4130
+    set PP21 random 4130
+    set PP22 random 4130
+      set PPX random 4130
     ]
 
     if CIN-level = 6 [
-    set PP1 random 120
-    set PP2 random 120
-    set PP3 random 120
-    set PP4 random 120
-    set PP5 random 120
-    set PP6 random 120
-    set PP7 random 120
-    set PP8 random 120
-    set PP9 random 120
-    set PP10 random 120
-    set PP11 random 120
-    set PP12 random 120
-    set PP13 random 120
-    set PP14 random 120
-    set PP15 random 120
-    set PP16 random 120
-    set PP17 random 120
-    set PP18 random 120
-    set PP19 random 120
-    set PP20 random 120
-    set PP21 random 120
-    set PP22 random 120
-      set PPX random 120
+    set PP1 random 260
+    set PP2 random 260
+    set PP3 random 260
+    set PP4 random 260
+    set PP5 random 260
+    set PP6 random 260
+    set PP7 random 260
+    set PP8 random 260
+    set PP9 random 260
+    set PP10 random 260
+    set PP11 random 260
+    set PP12 random 260
+    set PP13 random 260
+    set PP14 random 260
+    set PP15 random 260
+    set PP16 random 260
+    set PP17 random 260
+    set PP18 random 260
+    set PP19 random 260
+    set PP20 random 260
+    set PP21 random 260
+    set PP22 random 260
+      set PPX random 260
     ]
 
     if CIN-level = 7 [
+    set PP1 random 130
+    set PP2 random 130
+    set PP3 random 130
+    set PP4 random 130
+    set PP5 random 130
+    set PP6 random 130
+    set PP7 random 130
+    set PP8 random 130
+    set PP9 random 130
+    set PP10 random 130
+    set PP11 random 130
+    set PP12 random 130
+    set PP13 random 130
+    set PP14 random 130
+    set PP15 random 130
+    set PP16 random 130
+    set PP17 random 130
+    set PP18 random 130
+    set PP19 random 130
+    set PP20 random 130
+    set PP21 random 130
+    set PP22 random 130
+      set PPX random 130
+    ]
+
+    if CIN-level = 8 [
     set PP1 random 60
     set PP2 random 60
     set PP3 random 60
@@ -979,7 +1013,7 @@ to assign-cin
       set PPX random 60
     ]
 
-    if CIN-level = 8 [
+      if CIN-level = 9 [
     set PP1 random 30
     set PP2 random 30
     set PP3 random 30
@@ -1001,11 +1035,11 @@ to assign-cin
     set PP19 random 30
     set PP20 random 30
     set PP21 random 30
-    set PP22 random 30
-    set PPX random 30
+      set PP22 random 30
+      set PPX random 30
     ]
 
-      if CIN-level = 9 [
+   if CIN-level = 10 [
     set PP1 random 20
     set PP2 random 20
     set PP3 random 20
@@ -1031,7 +1065,7 @@ to assign-cin
     set PPX random 20
     ]
 
-          if CIN-level = 10 [
+    if CIN-level = 11 [
     set PP1 random 15
     set PP2 random 15
     set PP3 random 15
@@ -1057,7 +1091,7 @@ to assign-cin
       set PPX random 15
     ]
 
-    if CIN-level = 11 [
+    if CIN-level = 12 [
     set PP1 random 10
     set PP2 random 10
     set PP3 random 10
@@ -1082,6 +1116,7 @@ to assign-cin
     set PP22 random 10
       set PPX random 10
     ]
+
 
     ;----------------------------- Set maternal gain/loss probability
     if CIN-level = 0 [
@@ -1111,6 +1146,32 @@ to assign-cin
     ]
 
      if CIN-level = 1 [
+    set MP1 random 73130
+    set MP2 random 73130
+    set MP3 random 73130
+    set MP4 random 73130
+    set MP5 random 73130
+    set MP6 random 73130
+    set MP7 random 73130
+    set MP8 random 73130
+    set MP9 random 73130
+    set MP10 random 73130
+    set MP11 random 73130
+    set MP12 random 73130
+    set MP13 random 73130
+    set MP14 random 73130
+    set MP15 random 73130
+    set MP16 random 73130
+    set MP17 random 73130
+    set MP18 random 73130
+    set MP19 random 73130
+    set MP20 random 73130
+    set MP21 random 73130
+    set MP22 random 73130
+    set MPX random 73130
+    ]
+
+    if CIN-level = 2 [
     set MP1 random 3680
     set MP2 random 3680
     set MP3 random 3680
@@ -1133,10 +1194,10 @@ to assign-cin
     set MP20 random 3680
     set MP21 random 3680
     set MP22 random 3680
-    set MPX random 3680
+      set MPX random 3680
     ]
 
-    if CIN-level = 2 [
+    if CIN-level = 3 [
     set MP1 random 1840
     set MP2 random 1840
     set MP3 random 1840
@@ -1162,111 +1223,111 @@ to assign-cin
       set MPX random 1840
     ]
 
-    if CIN-level = 3 [
-    set MP1 random 920
-    set MP2 random 920
-    set MP3 random 920
-    set MP4 random 920
-    set MP5 random 920
-    set MP6 random 920
-    set MP7 random 920
-    set MP8 random 920
-    set MP9 random 920
-    set MP10 random 920
-    set MP11 random 920
-    set MP12 random 920
-    set MP13 random 920
-    set MP14 random 920
-    set MP15 random 920
-    set MP16 random 920
-    set MP17 random 920
-    set MP18 random 920
-    set MP19 random 920
-    set MP20 random 920
-    set MP21 random 920
-    set MP22 random 920
-      set MPX random 920
-    ]
-
     if CIN-level = 4 [
-    set MP1 random 460
-    set MP2 random 460
-    set MP3 random 460
-    set MP4 random 460
-    set MP5 random 460
-    set MP6 random 460
-    set MP7 random 460
-    set MP8 random 460
-    set MP9 random 460
-    set MP10 random 460
-    set MP11 random 460
-    set MP12 random 460
-    set MP13 random 460
-    set MP14 random 460
-    set MP15 random 460
-    set MP16 random 460
-    set MP17 random 460
-    set MP18 random 460
-    set MP19 random 460
-    set MP20 random 460
-    set MP21 random 460
-    set MP22 random 460
-      set MPX random 460
+    set MP1 random 930
+    set MP2 random 930
+    set MP3 random 930
+    set MP4 random 930
+    set MP5 random 930
+    set MP6 random 930
+    set MP7 random 930
+    set MP8 random 930
+    set MP9 random 930
+    set MP10 random 930
+    set MP11 random 930
+    set MP12 random 930
+    set MP13 random 930
+    set MP14 random 930
+    set MP15 random 930
+    set MP16 random 930
+    set MP17 random 930
+    set MP18 random 930
+    set MP19 random 930
+    set MP20 random 930
+    set MP21 random 930
+    set MP22 random 930
+      set MPX random 930
     ]
 
     if CIN-level = 5 [
-    set MP1 random 230
-    set MP2 random 230
-    set MP3 random 230
-    set MP4 random 230
-    set MP5 random 230
-    set MP6 random 230
-    set MP7 random 230
-    set MP8 random 230
-    set MP9 random 230
-    set MP10 random 230
-    set MP11 random 230
-    set MP12 random 230
-    set MP13 random 230
-    set MP14 random 230
-    set MP15 random 230
-    set MP16 random 230
-    set MP17 random 230
-    set MP18 random 230
-    set MP19 random 230
-    set MP20 random 230
-    set MP21 random 230
-    set MP22 random 230
-      set MPX random 230
+    set MP1 random 4130
+    set MP2 random 4130
+    set MP3 random 4130
+    set MP4 random 4130
+    set MP5 random 4130
+    set MP6 random 4130
+    set MP7 random 4130
+    set MP8 random 4130
+    set MP9 random 4130
+    set MP10 random 4130
+    set MP11 random 4130
+    set MP12 random 4130
+    set MP13 random 4130
+    set MP14 random 4130
+    set MP15 random 4130
+    set MP16 random 4130
+    set MP17 random 4130
+    set MP18 random 4130
+    set MP19 random 4130
+    set MP20 random 4130
+    set MP21 random 4130
+    set MP22 random 4130
+      set MPX random 4130
     ]
 
     if CIN-level = 6 [
-    set MP1 random 120
-    set MP2 random 120
-    set MP3 random 120
-    set MP4 random 120
-    set MP5 random 120
-    set MP6 random 120
-    set MP7 random 120
-    set MP8 random 120
-    set MP9 random 120
-    set MP10 random 120
-    set MP11 random 120
-    set MP12 random 120
-    set MP13 random 120
-    set MP14 random 120
-    set MP15 random 120
-    set MP16 random 120
-    set MP17 random 120
-    set MP18 random 120
-    set MP19 random 120
-    set MP20 random 120
-    set MP21 random 120
-    set MP22 random 120
-      set MPX random 120
+    set MP1 random 260
+    set MP2 random 260
+    set MP3 random 260
+    set MP4 random 260
+    set MP5 random 260
+    set MP6 random 260
+    set MP7 random 260
+    set MP8 random 260
+    set MP9 random 260
+    set MP10 random 260
+    set MP11 random 260
+    set MP12 random 260
+    set MP13 random 260
+    set MP14 random 260
+    set MP15 random 260
+    set MP16 random 260
+    set MP17 random 260
+    set MP18 random 260
+    set MP19 random 260
+    set MP20 random 260
+    set MP21 random 260
+    set MP22 random 260
+      set MPX random 260
     ]
 
     if CIN-level = 7 [
+    set MP1 random 130
+    set MP2 random 130
+    set MP3 random 130
+    set MP4 random 130
+    set MP5 random 130
+    set MP6 random 130
+    set MP7 random 130
+    set MP8 random 130
+    set MP9 random 130
+    set MP10 random 130
+    set MP11 random 130
+    set MP12 random 130
+    set MP13 random 130
+    set MP14 random 130
+    set MP15 random 130
+    set MP16 random 130
+    set MP17 random 130
+    set MP18 random 130
+    set MP19 random 130
+    set MP20 random 130
+    set MP21 random 130
+    set MP22 random 130
+      set MPX random 130
+    ]
+
+    if CIN-level = 8 [
     set MP1 random 60
     set MP2 random 60
     set MP3 random 60
@@ -1292,7 +1353,7 @@ to assign-cin
       set MPX random 60
     ]
 
-    if CIN-level = 8 [
+      if CIN-level = 9 [
     set MP1 random 30
     set MP2 random 30
     set MP3 random 30
@@ -1314,11 +1375,11 @@ to assign-cin
     set MP19 random 30
     set MP20 random 30
     set MP21 random 30
-    set MP22 random 30
+      set MP22 random 30
       set MPX random 30
     ]
 
-      if CIN-level = 9 [
+   if CIN-level = 10 [
     set MP1 random 20
     set MP2 random 20
     set MP3 random 20
@@ -1340,11 +1401,11 @@ to assign-cin
     set MP19 random 20
     set MP20 random 20
     set MP21 random 20
-      set MP22 random 20
-      set MPX random 20
+    set MP22 random 20
+    set MPX random 20
     ]
 
-   if CIN-level = 10 [
+    if CIN-level = 11 [
     set MP1 random 15
     set MP2 random 15
     set MP3 random 15
@@ -1367,10 +1428,10 @@ to assign-cin
     set MP20 random 15
     set MP21 random 15
     set MP22 random 15
-    set MPX random 15
+      set MPX random 15
     ]
 
-    if CIN-level = 11 [
+    if CIN-level = 12 [
     set MP1 random 10
     set MP2 random 10
     set MP3 random 10
@@ -2596,8 +2657,8 @@ SLIDER
 initial-CIN
 initial-CIN
 0
-11
-10.0
+12
+1.0
 1
 1
 NIL
@@ -2745,7 +2806,7 @@ selective-pressure
 selective-pressure
 0
 10
-50.0
+5.0
 1
 1
 NIL
@@ -2757,7 +2818,7 @@ INPUTBOX
 365
 190
 end-ticks
-80.0
+100.0
 1
 0
 Number
@@ -2812,7 +2873,7 @@ INPUTBOX
 190
 110
 initial-number
-500.0
+1.0
 1
 0
 Number
@@ -2823,7 +2884,7 @@ INPUTBOX
 165
 310
 cin-period-start
-64.0
+0.0
 1
 0
 Number
@@ -2834,7 +2895,7 @@ INPUTBOX
 312
 310
 cin-period-end
-80.0
+100.0
 1
 0
 Number
@@ -2847,7 +2908,7 @@ CHOOSER
 periodicity
 periodicity
 "constant" "early" "middle" "late"
-3
+0
 
 PLOT
 340
@@ -2877,7 +2938,7 @@ INPUTBOX
 517
 95
 mitosis-probability
-100.0
+200.0
 1
 0
 Number
@@ -3224,7 +3285,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 3D 6.1.1
+NetLogo 3D 6.0.4
 @#$#@#$#@
 need-to-manually-make-preview-for-this-model
 @#$#@#$#@
