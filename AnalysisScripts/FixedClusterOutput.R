@@ -25,11 +25,12 @@ getmode <- function(v) {
 }
 
 #Insert datafile here:
-mydata <- `22102019ARL_ChromScores2`[2:38]
+mydata <- `02112019ChromScoreKaryoHybrid`[1:38]
 
 mydata$start.cin <- NULL
-
+mydata <- arrange(mydata, X.run.number.)
 mydata$X.run.number. <- seq(1:length(mydata$X.run.number.))
+mydata$mitosis.probability <- NULL
 
 trim.brackets <- function(x) gsub("\\[|\\]", "", x)
 mydata$Chrom1.final <- trim.brackets(mydata$Chrom1.final)
