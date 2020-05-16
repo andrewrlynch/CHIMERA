@@ -1,4 +1,4 @@
-## Stochastic model of CIN and selection
+## Chromosomal Instability - Modeling/Estimation of Rates (ChIMERa)
 Population-level karyptypic variation is dependent on 4 factors:<br>
 1. Chromosome missegregation rate
 2. Positive or negative selection on aneuploid cells
