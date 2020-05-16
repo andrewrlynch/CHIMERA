@@ -26,6 +26,7 @@ globals
   Chrom21-final
   Chrom22-final
   ChromX-final
+  fitness-final
   x
   CIN-rate
   total-misseg
@@ -346,10 +347,11 @@ to setup
 end
 
 to translate-cin-rates
-set CIN-rate 100 / initial-CIN
+  ifelse initial-CIN = 0
+  [set CIN-rate 0]
+  [set CIN-rate 100 / initial-CIN]
 
 end
-
 
 to setup-progenitor
   create-tumorcells initial-number
@@ -358,7 +360,6 @@ to setup-progenitor
     set MitosisProbability random 100
     set karyotype (initial-ploidy) * 23
     assign-gain-loss
-    set CIN-level 0
 
     set MChrom1 initial-ploidy / 2
     set MChrom2 initial-ploidy / 2
@@ -481,53 +482,54 @@ to setup-progenitor
     set CS21 -0.0062
     set CS22 -0.0100
 
-    set MP1 random initial-CIN
-    set MP2 random initial-CIN
-    set MP3 random initial-CIN
-    set MP4 random initial-CIN
-    set MP5 random initial-CIN
-    set MP6 random initial-CIN
-    set MP7 random initial-CIN
-    set MP8 random initial-CIN
-    set MP9 random initial-CIN
-    set MP10 random initial-CIN
-    set MP11 random initial-CIN
-    set MP12 random initial-CIN
-    set MP13 random initial-CIN
-    set MP14 random initial-CIN
-    set MP15 random initial-CIN
-    set MP16 random initial-CIN
-    set MP17 random initial-CIN
-    set MP18 random initial-CIN
-    set MP19 random initial-CIN
-    set MP20 random initial-CIN
-    set MP21 random initial-CIN
-    set MP22 random initial-CIN
-    set MPX random initial-CIN
+        set MP1 999
+    set MP2 999
+    set MP3 999
+    set MP4 999
+    set MP5 999
+    set MP6 999
+    set MP7 999
+    set MP8 999
+    set MP9 999
+    set MP10 999
+    set MP11 999
+    set MP12 999
+    set MP13 999
+    set MP14 999
+    set MP15 999
+    set MP16 999
+    set MP17 999
+    set MP18 999
+    set MP19 999
+    set MP20 999
+    set MP21 999
+    set MP22 999
+    set MPX 999
 
-    set PP1 random initial-CIN
-    set PP2 random initial-CIN
-    set PP3 random initial-CIN
-    set PP4 random initial-CIN
-    set PP5 random initial-CIN
-    set PP6 random initial-CIN
-    set PP7 random initial-CIN
-    set PP8 random initial-CIN
-    set PP9 random initial-CIN
-    set PP10 random initial-CIN
-    set PP11 random initial-CIN
-    set PP12 random initial-CIN
-    set PP13 random initial-CIN
-    set PP14 random initial-CIN
-    set PP15 random initial-CIN
-    set PP16 random initial-CIN
-    set PP17 random initial-CIN
-    set PP18 random initial-CIN
-    set PP19 random initial-CIN
-    set PP20 random initial-CIN
-    set PP21 random initial-CIN
-    set PP22 random initial-CIN
-    set PPX random initial-CIN
+    set PP1 999
+    set PP2 999
+    set PP3 999
+    set PP4 999
+    set PP5 999
+    set PP6 999
+    set PP7 999
+    set PP8 999
+    set PP9 999
+    set PP10 999
+    set PP11 999
+    set PP12 999
+    set PP13 999
+    set PP14 999
+    set PP15 999
+    set PP16 999
+    set PP17 999
+    set PP18 999
+    set PP19 999
+    set PP20 999
+    set PP21 999
+    set PP22 999
+    set PPX 999
+
     set CINList (list MP1 MP2 MP3 MP4 MP5 MP6 MP7 MP8 MP9 MP10 MP11 MP12 MP13 MP14 MP15 MP16 MP17 MP18 MP19 MP20 MP21 MP22 MPX PP1 PP2 PP3 PP4 PP5 PP6 PP7 PP8 PP9 PP10 PP11 PP12 PP13 PP14 PP15 PP16 PP17 PP18 PP19 PP20 PP21 PP22 PPX)
   ]
 end
@@ -536,10 +538,10 @@ to setup-progenitor-attributes
   ask tumorcells [
   calculate-chromosome-scores
   calculate-fitness
-  assign-cin
   assign-gain-loss
   set-color
   ]
+  assign-cin
 end
 
 to assign-gain-loss
@@ -605,26 +607,24 @@ to set-color
     if fitness < 0.6 [set color 19.9 - 3.5]
     if fitness < 0.55 [set color 19.9 - 4.0]
     if fitness < 0.5 [set color 19.9 - 4.5]
+  set color lput 100 extract-rgb color
 
 end
 
 to go
-  calculate-chromosome-scores
-  calculate-fitness
-  ;check-death
 if (ticks < 1) [ reset-timer ]
 if ticks = end-ticks or count tumorcells >= end-population
   [
     show (word "Execution  finished  in " timer " seconds ")
-    output-chromosome-state
+    ;output-chromosome-state
     stop
   ]
-
-  assign-mitosis-probability
+  calculate-chromosome-scores
+  calculate-fitness
   check-death
-  apply-periodicity
-  assign-gain-loss
+  assign-mitosis-probability
   assign-cin
+  assign-gain-loss
   reset-division-state
 
   ask tumorcells[
@@ -634,6 +634,7 @@ if ticks = end-ticks or count tumorcells >= end-population
       mitosis2
   ]]
   count-tandem-losses
+  output-chromosome-state
 tick
 end
 
@@ -664,18 +665,160 @@ to count-tandem-losses
     ChromX = 0 ]
 end
 
-to apply-periodicity
+to assign-cin
 if (ticks >= cin-period-start) [
     ask tumorcells [
-      set CIN-level initial-cin
+      ifelse initial-CIN = 0
+    [
+    set MP1 999
+    set MP2 999
+    set MP3 999
+    set MP4 999
+    set MP5 999
+    set MP6 999
+    set MP7 999
+    set MP8 999
+    set MP9 999
+    set MP10 999
+    set MP11 999
+    set MP12 999
+    set MP13 999
+    set MP14 999
+    set MP15 999
+    set MP16 999
+    set MP17 999
+    set MP18 999
+    set MP19 999
+    set MP20 999
+    set MP21 999
+    set MP22 999
+    set MPX 999
+
+    set PP1 999
+    set PP2 999
+    set PP3 999
+    set PP4 999
+    set PP5 999
+    set PP6 999
+    set PP7 999
+    set PP8 999
+    set PP9 999
+    set PP10 999
+    set PP11 999
+    set PP12 999
+    set PP13 999
+    set PP14 999
+    set PP15 999
+    set PP16 999
+    set PP17 999
+    set PP18 999
+    set PP19 999
+    set PP20 999
+    set PP21 999
+    set PP22 999
+    set PPX 999
     ]
-    assign-cin
+      [
+    set MP1 random initial-CIN
+    set MP2 random initial-CIN
+    set MP3 random initial-CIN
+    set MP4 random initial-CIN
+    set MP5 random initial-CIN
+    set MP6 random initial-CIN
+    set MP7 random initial-CIN
+    set MP8 random initial-CIN
+    set MP9 random initial-CIN
+    set MP10 random initial-CIN
+    set MP11 random initial-CIN
+    set MP12 random initial-CIN
+    set MP13 random initial-CIN
+    set MP14 random initial-CIN
+    set MP15 random initial-CIN
+    set MP16 random initial-CIN
+    set MP17 random initial-CIN
+    set MP18 random initial-CIN
+    set MP19 random initial-CIN
+    set MP20 random initial-CIN
+    set MP21 random initial-CIN
+    set MP22 random initial-CIN
+    set MPX random initial-CIN
+
+    set PP1 random initial-CIN
+    set PP2 random initial-CIN
+    set PP3 random initial-CIN
+    set PP4 random initial-CIN
+    set PP5 random initial-CIN
+    set PP6 random initial-CIN
+    set PP7 random initial-CIN
+    set PP8 random initial-CIN
+    set PP9 random initial-CIN
+    set PP10 random initial-CIN
+    set PP11 random initial-CIN
+    set PP12 random initial-CIN
+    set PP13 random initial-CIN
+    set PP14 random initial-CIN
+    set PP15 random initial-CIN
+    set PP16 random initial-CIN
+    set PP17 random initial-CIN
+    set PP18 random initial-CIN
+    set PP19 random initial-CIN
+    set PP20 random initial-CIN
+    set PP21 random initial-CIN
+    set PP22 random initial-CIN
+    set PPX random initial-CIN
+  ]
+    ]
   ]
 if (ticks > cin-period-end) [
       ask tumorcells [
-        set CIN-level 0
+        set MP1 999
+    set MP2 999
+    set MP3 999
+    set MP4 999
+    set MP5 999
+    set MP6 999
+    set MP7 999
+    set MP8 999
+    set MP9 999
+    set MP10 999
+    set MP11 999
+    set MP12 999
+    set MP13 999
+    set MP14 999
+    set MP15 999
+    set MP16 999
+    set MP17 999
+    set MP18 999
+    set MP19 999
+    set MP20 999
+    set MP21 999
+    set MP22 999
+    set MPX 999
+
+    set PP1 999
+    set PP2 999
+    set PP3 999
+    set PP4 999
+    set PP5 999
+    set PP6 999
+    set PP7 999
+    set PP8 999
+    set PP9 999
+    set PP10 999
+    set PP11 999
+    set PP12 999
+    set PP13 999
+    set PP14 999
+    set PP15 999
+    set PP16 999
+    set PP17 999
+    set PP18 999
+    set PP19 999
+    set PP20 999
+    set PP21 999
+    set PP22 999
+    set PPX 999
     ]
-    assign-cin
   ]
 end
 
@@ -802,13 +945,6 @@ to reset-division-state
   set pmiseg21 0
   set pmiseg22 0
   set pmisegX 0
-  ]
-end
-
-to assign-cin
-  ask tumorcells[
-    foreach CINList [
-      [n] -> set n (random initial-CIN) ]
   ]
 end
 
@@ -1710,8 +1846,6 @@ end
 to set-position
       rt random 90
       lt random 90
-      tilt-down random 90
-      tilt-up random 90
       fd 1.00
 end
 
@@ -1776,17 +1910,17 @@ to calculate-fitness
 if model = "Hybrid" [
     calculate-fitness-hybrid
   ]
-if model = "Karyo" [
-    calculate-fitness-karyo
+if model = "Abundance" [
+    calculate-fitness-abundance
   ]
-if model = "Chrom-Score" [
-    calculate-fitness-chromscore
+if model = "Driver" [
+    calculate-fitness-driver
   ]
 end
 
 to calculate-fitness-hybrid ;----------------------------------------fitness values
   ask tumorcells [
-    set fitness (precision ((((
+    set fitness (precision (((
       fitd1 +
       fitd2 +
       fitd3 +
@@ -1830,11 +1964,11 @@ to calculate-fitness-hybrid ;----------------------------------------fitness val
       ((Chrom19 * CS19) / chromavg) +
       ((Chrom20 * CS20) / chromavg) +
       ((Chrom21 * CS21) / chromavg) +
-      ((Chrom22 * CS22) / chromavg)))) / 2) 3) ^ selective-pressure
+      ((Chrom22 * CS22) / chromavg))) / 2) 3) ^ selective-pressure
   ]
 end
 
-to calculate-fitness-chromscore
+to calculate-fitness-driver
   ask tumorcells [
     set fitness (precision ((
       ((Chrom1 * CS1) / chromavg) +
@@ -1862,7 +1996,7 @@ to calculate-fitness-chromscore
   ]
 end
 
-to calculate-fitness-karyo
+to calculate-fitness-abundance
 ask tumorcells [
    set fitness (precision(fitd1 +
     fitd2 +
@@ -1951,9 +2085,13 @@ end
 to output-chromosome-state
  set x count tumorcells
 
-  let selected-tumorcells ifelse-value (x >= 100)
+  let selected-tumorcells ifelse-value (x >= outputcount)
   [n-of outputcount tumorcells]
   [n-of count tumorcells tumorcells]
+  ask selected-tumorcells [
+    set color 95
+    set color [6 175 201 255]
+  ]
 
   set Chrom1-final [Chrom1] of selected-tumorcells
   set Chrom2-final [Chrom2] of selected-tumorcells
@@ -1978,6 +2116,7 @@ to output-chromosome-state
   set Chrom21-final [Chrom21] of selected-tumorcells
   set Chrom22-final [Chrom22] of selected-tumorcells
   set ChromX-final [ChromX] of selected-tumorcells
+  set fitness-final [fitness] of selected-tumorcells
   if count tumorcells > 1
   [set MKV mean(list
     variance [Chrom1] of selected-tumorcells
@@ -2008,13 +2147,13 @@ to output-chromosome-state
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-0
-0
-4908
-4909
+335
+13
+663
+342
 -1
 -1
-100.0
+7.805
 1
 10
 1
@@ -2024,12 +2163,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--24
-24
--24
-24
--24
-24
+-20
+20
+-20
+20
 1
 1
 1
@@ -2037,11 +2174,11 @@ ticks
 30.0
 
 BUTTON
-20
-10
-86
-43
-NIL
+29
+30
+95
+63
+Setup
 setup\n
 NIL
 1
@@ -2054,11 +2191,11 @@ NIL
 1
 
 BUTTON
-85
-10
-148
-43
-NIL
+96
+30
+159
+63
+Go
 go
 T
 1
@@ -2068,67 +2205,218 @@ NIL
 NIL
 NIL
 NIL
-0
+1
+
+BUTTON
+161
+30
+224
+63
+Step
+go
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 MONITOR
-210
-10
-295
-55
+226
+19
+304
+64
 Cell Count
 count turtles
-17
+0
 1
 11
 
-BUTTON
-145
-10
-208
-43
-step
-go
-NIL
+INPUTBOX
+30
+65
+179
+125
+initial-number
+1.0
 1
-T
-OBSERVER
+0
+Number
+
+INPUTBOX
+30
+365
+179
+425
+initial-CIN
+23000.0
+1
+0
+Number
+
+SLIDER
+178
+306
+328
+339
+initial-ploidy
+initial-ploidy
+2
+6
+2.0
+2
+1
 NIL
-NIL
-NIL
-NIL
+HORIZONTAL
+
+INPUTBOX
+30
+125
+179
+185
+end-ticks
+100.0
+1
+0
+Number
+
+INPUTBOX
+30
+245
+179
+305
+outputcount
+200.0
+1
+0
+Number
+
+INPUTBOX
+179
+170
+328
+230
+cin-period-end
+20.0
+1
+0
+Number
+
+INPUTBOX
+30
+185
+179
+245
+end-population
+100000.0
+1
+0
+Number
+
+INPUTBOX
+179
+110
+328
+170
+cin-period-start
+0.0
+1
+0
+Number
+
+CHOOSER
+179
+65
+317
+110
+periodicity
+periodicity
+"constant" "early" "middle" "late"
 1
 
+INPUTBOX
+30
+305
+179
+365
+mitosis-probability
+200.0
+1
+0
+Number
+
+CHOOSER
+179
+230
+328
+275
+model
+model
+"Hybrid" "Driver" "Abundance"
+0
+
+SLIDER
+179
+274
+328
+307
+selective-pressure
+selective-pressure
+0
+20
+5.0
+1
+1
+NIL
+HORIZONTAL
+
 PLOT
-500
-310
-755
-445
-Average Chromosome Number
-Time
-Average Chromosome #
+230
+425
+430
+575
+Average Fitness
+NIL
+NIL
 0.0
 10.0
 0.0
-10.0
+2.0
 true
-true
+false
 "" ""
 PENS
-"1" 1.0 0 -16777216 true "" "plot mean [ Chrom1 ] of tumorcells "
-"X" 1.0 0 -7500403 true "" "plot mean [ ChromX ] of tumorcells"
-"2" 1.0 0 -2674135 true "" "plot mean [ Chrom2 ] of tumorcells"
-"3" 1.0 0 -955883 true "" "plot mean [ Chrom3 ] of tumorcells"
-"7" 1.0 0 -6459832 true "" "plot mean [ Chrom7 ] of tumorcells"
-"9" 1.0 0 -1184463 true "" "plot mean [ chrom9 ] of tumorcells"
+"default" 1.0 0 -16777216 true "" "plot mean [ fitness ] of tumorcells"
 
 PLOT
-180
-310
-340
-445
+30
+425
+230
+575
+Population
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"All cells" 1.0 0 -16777216 true "" "plot count tumorcells"
+
+PLOT
+430
+425
+630
+575
 Average Ploidy
-Time
-# Chromosomes
+NIL
+NIL
 0.0
 10.0
 0.0
@@ -2138,14 +2426,44 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot mean [ karyotype ] of tumorcells / 23"
-"pen-1" 1.0 0 -8053223 true "" "plot median [ karyotype ] of tumorcells / 23"
 
 PLOT
-20
-335
-180
-470
-Total Population v time
+701
+69
+1055
+271
+Copy Numbers
+NIL
+NIL
+0.0
+10.0
+0.0
+6.0
+true
+true
+"" ""
+PENS
+"1" 1.0 0 -16777216 true "" "plot mean [ Chrom1 ] of tumorcells "
+"X" 1.0 0 -7500403 true "" "plot mean [ ChromX ] of tumorcells"
+"2" 1.0 0 -2674135 true "" "plot mean [ Chrom2 ] of tumorcells"
+"3" 1.0 0 -955883 true "" "plot mean [ Chrom3 ] of tumorcells"
+"4" 1.0 0 -6459832 true "" "plot mean [ Chrom4 ] of tumorcells"
+"5" 1.0 0 -1184463 true "" "plot mean [ Chrom5 ] of tumorcells"
+"6" 1.0 0 -10899396 true "" "plot mean [ Chrom6 ] of tumorcells"
+"7" 1.0 0 -13840069 true "" "plot mean [ Chrom7 ] of tumorcells"
+"8" 1.0 0 -14835848 true "" "plot mean [ Chrom8 ] of tumorcells"
+"9" 1.0 0 -11221820 true "" "plot mean [ Chrom9 ] of tumorcells"
+"10" 1.0 0 -13791810 true "" "plot mean [ Chrom10 ] of tumorcells"
+"11" 1.0 0 -13345367 true "" "plot mean [ Chrom11 ] of tumorcells"
+"12" 1.0 0 -8630108 true "" "plot mean [ Chrom12 ] of tumorcells"
+"13" 1.0 0 -5825686 true "" "plot mean [ Chrom13 ] of tumorcells"
+
+PLOT
+383
+575
+630
+777
+Tandem Losses
 NIL
 NIL
 0.0
@@ -2156,205 +2474,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot count turtles"
-"pen-1" 1.0 0 -8053223 true "" "plot tandem-losses"
-
-SLIDER
-19
-205
-193
-238
-end-population
-end-population
-1000
-200000
-200000.0
-1000
-1
-NIL
-HORIZONTAL
-
-PLOT
-340
-310
-500
-445
-Average Fitness
-NIL
-NIL
-0.0
-10.0
-0.0
-1.1
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot mean [ fitness ] of tumorcells"
-"pen-1" 1.0 0 -7500403 true "" ""
-
-SLIDER
-19
-240
-194
-273
-selective-pressure
-selective-pressure
-0
-10
-0.0
-1
-1
-NIL
-HORIZONTAL
-
-INPUTBOX
-195
-130
-365
-190
-end-ticks
-500.0
-1
-0
-Number
-
-PLOT
-20
-470
-340
-610
-Average Karyotype
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot mean [ karyotype ] of tumorcells"
-
-SLIDER
-19
-170
-191
-203
-initial-ploidy
-initial-ploidy
-0
-8
-2.0
-2
-1
-NIL
-HORIZONTAL
-
-INPUTBOX
-195
-190
-365
-250
-outputcount
-100.0
-1
-0
-Number
-
-INPUTBOX
-20
-50
-190
-110
-initial-number
-1.0
-1
-0
-Number
-
-INPUTBOX
-20
-275
-165
-335
-cin-period-start
-0.0
-1
-0
-Number
-
-INPUTBOX
-195
-250
-342
-310
-cin-period-end
-500.0
-1
-0
-Number
-
-CHOOSER
-200
-75
-338
-120
-periodicity
-periodicity
-"constant" "early" "middle" "late"
-0
-
-PLOT
-340
-445
-755
-610
-tandem-losses
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-true
-"" ""
-PENS
-"1" 1.0 0 -16777216 true "" "plot tandem-losses"
-
-INPUTBOX
-370
-35
-517
-95
-mitosis-probability
-200.0
-1
-0
-Number
-
-INPUTBOX
-20
-110
-190
-170
-initial-CIN
-250.0
-1
-0
-Number
-
-CHOOSER
-500
-250
-667
-295
-model
-model
-"Hybrid" "Karyo" "Chrom-Score"
-0
+"default" 1.0 0 -16777216 true "" "plot tandem-losses"
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -2459,6 +2579,12 @@ false
 0
 Circle -7500403 true true 0 0 300
 Circle -16777216 true false 30 30 240
+
+circle-outline
+false
+0
+Circle -1 true false 0 0 300
+Circle -16777216 false false -2 -2 302
 
 cow
 false
@@ -2698,555 +2824,17 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 3D 6.0.4
+NetLogo 6.0.4
 @#$#@#$#@
-need-to-manually-make-preview-for-this-model
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="CINTEST" repetitions="20" runMetricsEveryStep="false">
+  <experiment name="experiment" repetitions="4" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
-    <metric>Chrom1-final</metric>
-    <metric>Chrom2-final</metric>
-    <metric>Chrom3-final</metric>
-    <metric>Chrom4-final</metric>
-    <metric>Chrom5-final</metric>
-    <metric>Chrom6-final</metric>
-    <metric>Chrom7-final</metric>
-    <metric>Chrom8-final</metric>
-    <metric>Chrom9-final</metric>
-    <metric>Chrom10-final</metric>
-    <metric>Chrom11-final</metric>
-    <metric>Chrom12-final</metric>
-    <metric>Chrom13-final</metric>
-    <metric>Chrom14-final</metric>
-    <metric>Chrom15-final</metric>
-    <metric>Chrom16-final</metric>
-    <metric>Chrom17-final</metric>
-    <metric>Chrom18-final</metric>
-    <metric>Chrom19-final</metric>
-    <metric>Chrom20-final</metric>
-    <metric>Chrom21-final</metric>
-    <metric>Chrom22-final</metric>
-    <metric>ChromX-final</metric>
-    <enumeratedValueSet variable="initial-number">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="SAC">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="show-resources?">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-CIN">
-      <value value="0"/>
-      <value value="1"/>
-      <value value="2"/>
-      <value value="3"/>
-      <value value="4"/>
-      <value value="5"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="CIN Sensitivity" repetitions="20" runMetricsEveryStep="false">
-    <setup>setup</setup>
-    <go>go</go>
-    <enumeratedValueSet variable="initial-number">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="SAC">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="show-resources?">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-CIN">
-      <value value="0"/>
-      <value value="1"/>
-      <value value="2"/>
-      <value value="3"/>
-      <value value="4"/>
-      <value value="5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-ploidy">
-      <value value="2"/>
-      <value value="3"/>
-      <value value="4"/>
-      <value value="5"/>
-      <value value="6"/>
-      <value value="7"/>
-      <value value="8"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-population">
-      <value value="10000"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="CIN Sensitivity - v3" repetitions="20" runMetricsEveryStep="false">
-    <setup>setup</setup>
-    <go>go</go>
+    <metric>count turtles</metric>
+    <metric>MKV</metric>
     <metric>count tumorcells</metric>
-    <metric>count turtles with [karyotype / 23 != initial-ploidy]</metric>
-    <enumeratedValueSet variable="initial-number">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="SAC">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="show-resources?">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-CIN">
-      <value value="0"/>
-      <value value="1"/>
-      <value value="2"/>
-      <value value="3"/>
-      <value value="4"/>
-      <value value="5"/>
-      <value value="6"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-ploidy">
-      <value value="1"/>
-      <value value="2"/>
-      <value value="3"/>
-      <value value="4"/>
-      <value value="5"/>
-      <value value="6"/>
-      <value value="7"/>
-      <value value="8"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="selective-pressure">
-      <value value="0"/>
-      <value value="1"/>
-      <value value="2"/>
-      <value value="3"/>
-      <value value="4"/>
-      <value value="5"/>
-      <value value="6"/>
-      <value value="7"/>
-      <value value="8"/>
-      <value value="9"/>
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-ticks">
-      <value value="20"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-population">
-      <value value="100000"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="CIN Sensitivity - v4" repetitions="10" runMetricsEveryStep="false">
-    <setup>setup</setup>
-    <go>go</go>
-    <metric>count tumorcells</metric>
-    <metric>count turtles with [karyotype / 23 != initial-ploidy]</metric>
-    <metric>Chrom1-final</metric>
-    <metric>Chrom2-final</metric>
-    <metric>Chrom3-final</metric>
-    <metric>Chrom4-final</metric>
-    <metric>Chrom5-final</metric>
-    <metric>Chrom6-final</metric>
-    <metric>Chrom7-final</metric>
-    <metric>Chrom8-final</metric>
-    <metric>Chrom9-final</metric>
-    <metric>Chrom10-final</metric>
-    <metric>Chrom11-final</metric>
-    <metric>Chrom12-final</metric>
-    <metric>Chrom13-final</metric>
-    <metric>Chrom14-final</metric>
-    <metric>Chrom15-final</metric>
-    <metric>Chrom16-final</metric>
-    <metric>Chrom17-final</metric>
-    <metric>Chrom18-final</metric>
-    <metric>Chrom19-final</metric>
-    <metric>Chrom20-final</metric>
-    <metric>Chrom21-final</metric>
-    <metric>Chrom22-final</metric>
-    <metric>ChromX-final</metric>
-    <enumeratedValueSet variable="initial-number">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="SAC">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="show-resources?">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-CIN">
-      <value value="1"/>
-      <value value="5"/>
-      <value value="6"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-ploidy">
-      <value value="2"/>
-      <value value="3"/>
-      <value value="4"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="selective-pressure">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-ticks">
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-population">
-      <value value="80000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="start-cin">
-      <value value="3"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="CIN Sensitivity - v5 - taxol" repetitions="10" runMetricsEveryStep="false">
-    <setup>setup</setup>
-    <go>go</go>
-    <metric>count tumorcells</metric>
-    <metric>count turtles with [karyotype / 23 != initial-ploidy]</metric>
-    <metric>Chrom1-final</metric>
-    <metric>Chrom2-final</metric>
-    <metric>Chrom3-final</metric>
-    <metric>Chrom4-final</metric>
-    <metric>Chrom5-final</metric>
-    <metric>Chrom6-final</metric>
-    <metric>Chrom7-final</metric>
-    <metric>Chrom8-final</metric>
-    <metric>Chrom9-final</metric>
-    <metric>Chrom10-final</metric>
-    <metric>Chrom11-final</metric>
-    <metric>Chrom12-final</metric>
-    <metric>Chrom13-final</metric>
-    <metric>Chrom14-final</metric>
-    <metric>Chrom15-final</metric>
-    <metric>Chrom16-final</metric>
-    <metric>Chrom17-final</metric>
-    <metric>Chrom18-final</metric>
-    <metric>Chrom19-final</metric>
-    <metric>Chrom20-final</metric>
-    <metric>Chrom21-final</metric>
-    <metric>Chrom22-final</metric>
-    <metric>ChromX-final</metric>
-    <enumeratedValueSet variable="initial-number">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="SAC">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="show-resources?">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-CIN">
-      <value value="0"/>
-      <value value="1"/>
-      <value value="2"/>
-      <value value="3"/>
-      <value value="4"/>
-      <value value="5"/>
-      <value value="6"/>
-      <value value="7"/>
-      <value value="8"/>
-      <value value="9"/>
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-ploidy">
-      <value value="2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="selective-pressure">
-      <value value="0"/>
-      <value value="1"/>
-      <value value="2"/>
-      <value value="4"/>
-      <value value="8"/>
-      <value value="16"/>
-      <value value="32"/>
-      <value value="64"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-ticks">
-      <value value="15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-population">
-      <value value="100000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="start-cin">
-      <value value="14"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="FitnessPloidyModel" repetitions="5" runMetricsEveryStep="false">
-    <setup>setup</setup>
-    <go>go</go>
-    <metric>count tumorcells</metric>
-    <metric>count turtles with [karyotype / 23 != initial-ploidy]</metric>
-    <metric>Chrom1-final</metric>
-    <metric>Chrom2-final</metric>
-    <metric>Chrom3-final</metric>
-    <metric>Chrom4-final</metric>
-    <metric>Chrom5-final</metric>
-    <metric>Chrom6-final</metric>
-    <metric>Chrom7-final</metric>
-    <metric>Chrom8-final</metric>
-    <metric>Chrom9-final</metric>
-    <metric>Chrom10-final</metric>
-    <metric>Chrom11-final</metric>
-    <metric>Chrom12-final</metric>
-    <metric>Chrom13-final</metric>
-    <metric>Chrom14-final</metric>
-    <metric>Chrom15-final</metric>
-    <metric>Chrom16-final</metric>
-    <metric>Chrom17-final</metric>
-    <metric>Chrom18-final</metric>
-    <metric>Chrom19-final</metric>
-    <metric>Chrom20-final</metric>
-    <metric>Chrom21-final</metric>
-    <metric>Chrom22-final</metric>
-    <metric>ChromX-final</metric>
-    <enumeratedValueSet variable="initial-number">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="SAC">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="show-resources?">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-CIN">
-      <value value="2"/>
-      <value value="6"/>
-      <value value="8"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-ploidy">
-      <value value="2"/>
-      <value value="3"/>
-      <value value="4"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="selective-pressure">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-ticks">
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-population">
-      <value value="140000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="start-cin">
-      <value value="8"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="CINModelV6" repetitions="10" runMetricsEveryStep="false">
-    <setup>setup</setup>
-    <go>go</go>
-    <metric>count tumorcells</metric>
-    <metric>count turtles with [karyotype / 23 != initial-ploidy]</metric>
-    <metric>CIN-rate</metric>
-    <metric>Chrom1-final</metric>
-    <metric>Chrom2-final</metric>
-    <metric>Chrom3-final</metric>
-    <metric>Chrom4-final</metric>
-    <metric>Chrom5-final</metric>
-    <metric>Chrom6-final</metric>
-    <metric>Chrom7-final</metric>
-    <metric>Chrom8-final</metric>
-    <metric>Chrom9-final</metric>
-    <metric>Chrom10-final</metric>
-    <metric>Chrom11-final</metric>
-    <metric>Chrom12-final</metric>
-    <metric>Chrom13-final</metric>
-    <metric>Chrom14-final</metric>
-    <metric>Chrom15-final</metric>
-    <metric>Chrom16-final</metric>
-    <metric>Chrom17-final</metric>
-    <metric>Chrom18-final</metric>
-    <metric>Chrom19-final</metric>
-    <metric>Chrom20-final</metric>
-    <metric>Chrom21-final</metric>
-    <metric>Chrom22-final</metric>
-    <metric>ChromX-final</metric>
-    <enumeratedValueSet variable="initial-number">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="SAC">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="show-resources?">
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-CIN">
-      <value value="0"/>
-      <value value="1"/>
-      <value value="2"/>
-      <value value="3"/>
-      <value value="4"/>
-      <value value="5"/>
-      <value value="6"/>
-      <value value="7"/>
-      <value value="8"/>
-      <value value="9"/>
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-ploidy">
-      <value value="2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="selective-pressure">
-      <value value="0"/>
-      <value value="1"/>
-      <value value="10"/>
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-ticks">
-      <value value="14"/>
-      <value value="15"/>
-      <value value="18"/>
-      <value value="23"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-population">
-      <value value="200000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="start-cin">
-      <value value="13"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="VarianceOverTIme" repetitions="10" runMetricsEveryStep="false">
-    <setup>setup</setup>
-    <go>go</go>
-    <metric>count tumorcells</metric>
-    <metric>CIN-rate</metric>
-    <metric>count turtles with [karyotype / 23 != initial-ploidy]</metric>
-    <metric>Chrom1-final</metric>
-    <metric>Chrom2-final</metric>
-    <metric>Chrom3-final</metric>
-    <metric>Chrom4-final</metric>
-    <metric>Chrom5-final</metric>
-    <metric>Chrom6-final</metric>
-    <metric>Chrom7-final</metric>
-    <metric>Chrom8-final</metric>
-    <metric>Chrom9-final</metric>
-    <metric>Chrom10-final</metric>
-    <metric>Chrom11-final</metric>
-    <metric>Chrom12-final</metric>
-    <metric>Chrom13-final</metric>
-    <metric>Chrom14-final</metric>
-    <metric>Chrom15-final</metric>
-    <metric>Chrom16-final</metric>
-    <metric>Chrom17-final</metric>
-    <metric>Chrom18-final</metric>
-    <metric>Chrom19-final</metric>
-    <metric>Chrom20-final</metric>
-    <metric>Chrom21-final</metric>
-    <metric>Chrom22-final</metric>
-    <metric>ChromX-final</metric>
-    <enumeratedValueSet variable="initial-number">
-      <value value="500"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-CIN">
-      <value value="0"/>
-      <value value="1"/>
-      <value value="2"/>
-      <value value="3"/>
-      <value value="4"/>
-      <value value="5"/>
-      <value value="6"/>
-      <value value="7"/>
-      <value value="8"/>
-      <value value="9"/>
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-ploidy">
-      <value value="2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="selective-pressure">
-      <value value="0"/>
-      <value value="1"/>
-      <value value="10"/>
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-ticks">
-      <value value="1"/>
-      <value value="2"/>
-      <value value="5"/>
-      <value value="10"/>
-      <value value="100"/>
-      <value value="500"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-population">
-      <value value="400000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="start-cin">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="outputcount">
-      <value value="100"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="CINDoseResponse" repetitions="5" runMetricsEveryStep="false">
-    <setup>setup</setup>
-    <go>go</go>
-    <metric>count tumorcells</metric>
-    <metric>CIN-rate</metric>
-    <metric>count turtles with [karyotype / 23 != initial-ploidy]</metric>
-    <metric>Chrom1-final</metric>
-    <metric>Chrom2-final</metric>
-    <metric>Chrom3-final</metric>
-    <metric>Chrom4-final</metric>
-    <metric>Chrom5-final</metric>
-    <metric>Chrom6-final</metric>
-    <metric>Chrom7-final</metric>
-    <metric>Chrom8-final</metric>
-    <metric>Chrom9-final</metric>
-    <metric>Chrom10-final</metric>
-    <metric>Chrom11-final</metric>
-    <metric>Chrom12-final</metric>
-    <metric>Chrom13-final</metric>
-    <metric>Chrom14-final</metric>
-    <metric>Chrom15-final</metric>
-    <metric>Chrom16-final</metric>
-    <metric>Chrom17-final</metric>
-    <metric>Chrom18-final</metric>
-    <metric>Chrom19-final</metric>
-    <metric>Chrom20-final</metric>
-    <metric>Chrom21-final</metric>
-    <metric>Chrom22-final</metric>
-    <metric>ChromX-final</metric>
-    <enumeratedValueSet variable="initial-number">
-      <value value="1000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-CIN">
-      <value value="0"/>
-      <value value="1"/>
-      <value value="2"/>
-      <value value="3"/>
-      <value value="4"/>
-      <value value="5"/>
-      <value value="6"/>
-      <value value="7"/>
-      <value value="8"/>
-      <value value="9"/>
-      <value value="10"/>
-      <value value="11"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-ploidy">
-      <value value="2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="selective-pressure">
-      <value value="0"/>
-      <value value="1"/>
-      <value value="5"/>
-      <value value="10"/>
-      <value value="50"/>
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-ticks">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-population">
-      <value value="400000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="start-cin">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="outputcount">
-      <value value="100"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="CINModelProbability" repetitions="10" runMetricsEveryStep="false">
-    <setup>setup</setup>
-    <go>go</go>
-    <metric>count tumorcells</metric>
-    <metric>count turtles with [karyotype / 23 != initial-ploidy]</metric>
     <metric>MKV</metric>
     <metric>CIN-rate</metric>
     <metric>Chrom1-final</metric>
@@ -3272,59 +2860,210 @@ need-to-manually-make-preview-for-this-model
     <metric>Chrom21-final</metric>
     <metric>Chrom22-final</metric>
     <metric>ChromX-final</metric>
-    <enumeratedValueSet variable="initial-number">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-CIN">
+    <metric>fitness-final</metric>
+    <enumeratedValueSet variable="selective-pressure">
       <value value="0"/>
       <value value="1"/>
       <value value="2"/>
-      <value value="3"/>
-      <value value="4"/>
       <value value="5"/>
-      <value value="6"/>
-      <value value="7"/>
-      <value value="8"/>
-      <value value="9"/>
       <value value="10"/>
-      <value value="11"/>
-      <value value="12"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number">
+      <value value="1"/>
+      <value value="128"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="mitosis-probability">
+      <value value="200"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-CIN">
+      <value value="200"/>
+      <value value="209"/>
+      <value value="219"/>
+      <value value="230"/>
+      <value value="242"/>
+      <value value="256"/>
+      <value value="271"/>
+      <value value="288"/>
+      <value value="307"/>
+      <value value="329"/>
+      <value value="354"/>
+      <value value="383"/>
+      <value value="418"/>
+      <value value="460"/>
+      <value value="511"/>
+      <value value="575"/>
+      <value value="657"/>
+      <value value="767"/>
+      <value value="920"/>
+      <value value="1150"/>
+      <value value="1533"/>
+      <value value="2300"/>
+      <value value="4600"/>
+      <value value="9200"/>
+      <value value="13939"/>
+      <value value="18400"/>
+      <value value="23000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="initial-ploidy">
       <value value="2"/>
+      <value value="4"/>
     </enumeratedValueSet>
+    <steppedValueSet variable="end-ticks" first="1" step="2" last="60"/>
     <enumeratedValueSet variable="periodicity">
       <value value="&quot;constant&quot;"/>
       <value value="&quot;early&quot;"/>
       <value value="&quot;middle&quot;"/>
       <value value="&quot;late&quot;"/>
     </enumeratedValueSet>
+    <enumeratedValueSet variable="model">
+      <value value="&quot;Hybrid&quot;"/>
+      <value value="&quot;Driver&quot;"/>
+      <value value="&quot;Abundance&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="end-population">
+      <value value="100000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="outputcount">
+      <value value="300"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="PopulationGrowthCINSelection" repetitions="8" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>count tumorcells</metric>
     <enumeratedValueSet variable="selective-pressure">
       <value value="0"/>
       <value value="1"/>
+      <value value="2"/>
       <value value="5"/>
       <value value="10"/>
-      <value value="50"/>
-      <value value="100"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="end-ticks">
-      <value value="100"/>
+    <enumeratedValueSet variable="initial-number">
+      <value value="1"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="end-population">
-      <value value="200000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="outputcount">
-      <value value="100"/>
+    <enumeratedValueSet variable="cin-period-end">
+      <value value="200"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="mitosis-probability">
       <value value="200"/>
     </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-CIN">
+      <value value="0"/>
+      <value value="230"/>
+      <value value="2300"/>
+      <value value="4600"/>
+      <value value="9200"/>
+      <value value="37000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-ploidy">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="end-ticks">
+      <value value="60"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cin-period-start">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="periodicity">
+      <value value="&quot;constant&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="model">
+      <value value="&quot;Hybrid&quot;"/>
+      <value value="&quot;Driver&quot;"/>
+      <value value="&quot;Abundance&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="end-population">
+      <value value="100000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="outputcount">
+      <value value="200"/>
+    </enumeratedValueSet>
   </experiment>
-  <experiment name="ABCINPUT" repetitions="5" runMetricsEveryStep="false">
+  <experiment name="SamplingExperiment" repetitions="1" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
     <metric>count tumorcells</metric>
-    <metric>MKV</metric>
+    <metric>mean [ karyotype ] of tumorcells</metric>
+    <metric>mean [ fitness ] of tumorcells</metric>
+    <metric>CIN-rate</metric>
+    <metric>Chrom1-final</metric>
+    <metric>Chrom2-final</metric>
+    <metric>Chrom3-final</metric>
+    <metric>Chrom4-final</metric>
+    <metric>Chrom5-final</metric>
+    <metric>Chrom6-final</metric>
+    <metric>Chrom7-final</metric>
+    <metric>Chrom8-final</metric>
+    <metric>Chrom9-final</metric>
+    <metric>Chrom10-final</metric>
+    <metric>Chrom11-final</metric>
+    <metric>Chrom12-final</metric>
+    <metric>Chrom13-final</metric>
+    <metric>Chrom14-final</metric>
+    <metric>Chrom15-final</metric>
+    <metric>Chrom16-final</metric>
+    <metric>Chrom17-final</metric>
+    <metric>Chrom18-final</metric>
+    <metric>Chrom19-final</metric>
+    <metric>Chrom20-final</metric>
+    <metric>Chrom21-final</metric>
+    <metric>Chrom22-final</metric>
+    <metric>ChromX-final</metric>
+    <enumeratedValueSet variable="selective-pressure">
+      <value value="0"/>
+      <value value="1"/>
+      <value value="2"/>
+      <value value="5"/>
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-number">
+      <value value="200"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cin-period-end">
+      <value value="200"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="mitosis-probability">
+      <value value="200"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-CIN">
+      <value value="920"/>
+      <value value="2300"/>
+      <value value="4600"/>
+      <value value="9200"/>
+      <value value="37000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-ploidy">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="end-ticks">
+      <value value="60"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cin-period-start">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="periodicity">
+      <value value="&quot;constant&quot;"/>
+      <value value="&quot;early&quot;"/>
+      <value value="&quot;late&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="model">
+      <value value="&quot;Hybrid&quot;"/>
+      <value value="&quot;Driver&quot;"/>
+      <value value="&quot;Abundance&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="end-population">
+      <value value="100000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="outputcount">
+      <value value="800"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="PeriodicityDiversity" repetitions="4" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>count tumorcells</metric>
+    <metric>mean [ karyotype ] of tumorcells</metric>
+    <metric>mean [ fitness ] of tumorcells</metric>
     <metric>CIN-rate</metric>
     <metric>Chrom1-final</metric>
     <metric>Chrom2-final</metric>
@@ -3350,126 +3089,39 @@ need-to-manually-make-preview-for-this-model
     <metric>Chrom22-final</metric>
     <metric>ChromX-final</metric>
     <enumeratedValueSet variable="initial-number">
-      <value value="200"/>
+      <value value="1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="initial-CIN">
-      <value value="36800"/>
-      <value value="18400"/>
-      <value value="9200"/>
-      <value value="4600"/>
       <value value="2300"/>
-      <value value="1533"/>
-      <value value="1150"/>
-      <value value="920"/>
-      <value value="767"/>
-      <value value="657"/>
-      <value value="575"/>
-      <value value="511"/>
-      <value value="460"/>
-      <value value="418"/>
-      <value value="383"/>
-      <value value="354"/>
-      <value value="329"/>
-      <value value="307"/>
-      <value value="288"/>
-      <value value="271"/>
-      <value value="256"/>
-      <value value="242"/>
-      <value value="230"/>
-      <value value="219"/>
-      <value value="209"/>
-      <value value="200"/>
-      <value value="192"/>
-      <value value="184"/>
-      <value value="177"/>
-      <value value="170"/>
-      <value value="164"/>
-      <value value="159"/>
-      <value value="153"/>
-      <value value="148"/>
-      <value value="144"/>
-      <value value="139"/>
-      <value value="135"/>
-      <value value="131"/>
-      <value value="128"/>
-      <value value="124"/>
-      <value value="121"/>
-      <value value="118"/>
-      <value value="115"/>
-      <value value="112"/>
-      <value value="110"/>
-      <value value="107"/>
-      <value value="105"/>
-      <value value="102"/>
-      <value value="100"/>
+      <value value="4600"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="initial-ploidy">
       <value value="2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="periodicity">
-      <value value="&quot;constant&quot;"/>
-      <value value="&quot;late&quot;"/>
-      <value value="&quot;early&quot;"/>
-    </enumeratedValueSet>
-    <steppedValueSet variable="selective-pressure" first="0" step="1" last="10"/>
-    <steppedValueSet variable="end-ticks" first="1" step="2" last="60"/>
-    <enumeratedValueSet variable="end-population">
-      <value value="200000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="outputcount">
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="mitosis-probability">
-      <value value="200"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="model">
-      <value value="&quot;Hybrid&quot;"/>
-      <value value="&quot;Karyo&quot;"/>
-      <value value="&quot;Chrom-Score&quot;"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="tandem-losses" repetitions="4" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <metric>count tumorcells</metric>
-    <metric>MKV</metric>
-    <metric>count tumorcells with [Chrom1 = 0 or Chrom2 = 0 or Chrom3 = 0 or Chrom4 = 0 or Chrom5 = 0 or Chrom6 = 0 or Chrom7 = 0 or Chrom8 = 0 or Chrom9 = 0 or Chrom10 = 0 or Chrom11 = 0 or Chrom12 = 0 or Chrom13 = 0 or Chrom14 = 0 or Chrom15 = 0 or Chrom16 = 0 or Chrom17 = 0 or Chrom18 = 0 or Chrom19 = 0 or Chrom20 = 0 or Chrom21 = 0 or Chrom22 = 0 or ChromX = 0 ]</metric>
-    <metric>CIN-rate</metric>
-    <enumeratedValueSet variable="initial-number">
-      <value value="200"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-CIN">
-      <value value="4600"/>
-      <value value="2300"/>
-      <value value="1533"/>
-      <value value="1150"/>
-      <value value="920"/>
-      <value value="460"/>
-      <value value="307"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="initial-ploidy">
-      <value value="2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="periodicity">
-      <value value="&quot;constant&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="selective-pressure">
       <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-ticks">
-      <value value="20"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="end-population">
-      <value value="200000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="outputcount">
-      <value value="100"/>
+      <value value="2"/>
+      <value value="5"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="mitosis-probability">
+      <value value="200"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="periodicity">
+      <value value="&quot;early&quot;"/>
+      <value value="&quot;middle&quot;"/>
+      <value value="&quot;late&quot;"/>
+      <value value="&quot;constant&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="end-ticks">
       <value value="100"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="model">
-      <value value="&quot;Karyo&quot;"/>
+      <value value="&quot;Abundance&quot;"/>
+      <value value="&quot;Driver&quot;"/>
+      <value value="&quot;Hybrid&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="outputcount">
+      <value value="200"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
@@ -3486,5 +3138,5 @@ true
 Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 @#$#@#$#@
-1
+0
 @#$#@#$#@
